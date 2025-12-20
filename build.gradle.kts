@@ -1,5 +1,13 @@
 plugins {
+    id("application")
     id("java")
+    id("jvm-test-suite")
+    id("org.openjfx.javafxplugin") version "0.1.0"
+}
+
+javafx {
+    version = "21.0.9"
+    modules("javafx.controls", "javafx.fxml")
 }
 
 group = "at.ac.hcw"
