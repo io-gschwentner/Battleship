@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship;
+package at.ac.hcw.battleship.model;
 
 
 
@@ -70,5 +70,16 @@ public class GameBoard {
             }
         }
         return true;
+    }
+    public int getRemainingShipCells() {
+        int count = 0;
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                if (grid[r][c] == CellState.SHIP) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

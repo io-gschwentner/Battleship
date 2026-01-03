@@ -1,4 +1,6 @@
-package at.ac.hcw.battleship;
+package at.ac.hcw.battleship.logic;
+
+import at.ac.hcw.battleship.model.Ship;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +23,8 @@ public class GameSetup {
 
     }
 
-    public List<Ship> initializeOriginalShips(){
-        List <Ship> ships = new ArrayList<>();
+    public List<Ship> initializeOriginalShips() {
+        List<Ship> ships = new ArrayList<>();
         ships.add(new Ship("Destroyer 1", 2));
         ships.add(new Ship("Destroyer 2", 2));
         ships.add(new Ship("Carrier 1", 3));
@@ -34,10 +36,12 @@ public class GameSetup {
     }
 
 
-    public List<Ship> getShips(){return ships;}
+    public List<Ship> getShips() {
+        return ships;
+    }
 
 
-    public boolean allShipsPlaced(){
+    public boolean allShipsPlaced() {
         for (Ship ship : ships) {
             if (!ship.isPlaced())
                 return false;
@@ -46,7 +50,7 @@ public class GameSetup {
     }
 
     //reset ship list
-    public void resetBoard(){
+    public void resetBoard() {
         ships = new ArrayList<>(originalShips);
     }
 }

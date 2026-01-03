@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship;
+package at.ac.hcw.battleship.model;
 
 public class Ship {
 
