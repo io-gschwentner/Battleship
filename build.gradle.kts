@@ -10,6 +10,10 @@ javafx {
     modules("javafx.controls", "javafx.fxml")
 }
 
+application{
+    mainClass = "at.ac.hcw.battleship.Program"
+}
+
 group = "at.ac.hcw"
 version = "1.0-SNAPSHOT"
 
