@@ -18,7 +18,7 @@ public abstract class SuperBoardView {
     public static final int CELL_SIZE = 40;
 
     protected final GameBoard board;
-    protected final GameSetup setup;
+
     protected final Button[][] cellButton;
 
     protected int shipIndex = 0;
@@ -28,16 +28,16 @@ public abstract class SuperBoardView {
 
     public SuperBoardView() {
         this.board = new GameBoard(SIZE);
-        this.setup = new GameSetup();
+        this.cellButton = new Button[SIZE][SIZE];
+    }
+
+    public SuperBoardView(GameBoard gameBoard){
+        this.board = gameBoard;
         this.cellButton = new Button[SIZE][SIZE];
     }
 
     public GameBoard getBoard() {
         return board;
-    }
-
-    public GameSetup getSetup() {
-        return setup;
     }
 
     // ---------- layout building ----------
@@ -112,40 +112,5 @@ public abstract class SuperBoardView {
 
     abstract HBox createBottomPanel();
 
-    private GridPane createGrid() {
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(2);
-        grid.setVgap(2);
-
-        for (int row = 0; row < SIZE; row++) {
-            for (int col = 0; col < SIZE; col++) {
-                Button button = new Button();
-                button.setPrefSize(CELL_SIZE, CELL_SIZE);
-                button.setId(row + "," + col);
-
-                // add CSS style class for all cells
-                button.getStyleClass().add("cell-button");
-
-                cellButton[row][col] = button;
-
-                button.setOnAction(this::handleCellClick);
-
-                grid.add(button, col, row);
-            }
-        }
-        return grid;
-    }
-
-    // ---------- behavior ----------
-
-    private void handleCellClick(ActionEvent event) {
-        Button button = (Button) event.getSource();
-        String[] pos = button.getId().split(",");
-        int r = Integer.parseInt(pos[0]);
-        int c = Integer.parseInt(pos[1]);
-        onCellClicked(r, c);
-    }
-
-    abstract void onCellClicked(int r, int c);
+    abstract GridPane createGrid();
 }

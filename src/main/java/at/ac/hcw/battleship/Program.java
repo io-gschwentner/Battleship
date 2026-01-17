@@ -2,6 +2,7 @@
 package at.ac.hcw.battleship;
 
 import at.ac.hcw.battleship.logic.Game;
+import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.model.ui.BoardView;
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.ui.PlayerBoardView;
@@ -19,19 +20,23 @@ public class Program extends Application {
     @Override
     public void start(Stage stage) {
         // Player setup UI
-        BoardView playerView = new BoardView();
+        GameBoard test = new GameBoard(10);
+        test.placeShip(2,3,4,true);
+        PlayerBoardView playerView = new PlayerBoardView(test);
+
+        //BoardView playerView = new BoardView();
+
         BorderPane root = playerView.createRoot();
         Scene scene = new Scene(root, 500, 550);
-        stage.setScene(scene);
         stage.setTitle("Place your ships");
-        stage.show();
-
-        //GameBoard playerBoard = playerView.getBoard();
 
         scene.getStylesheets().add(
                 getClass().getResource("/styles.css").toExternalForm()
         );
         stage.setScene(scene);
+        stage.show();
+
+        GameBoard playerBoard = playerView.getBoard();
 
         // TODO: create enemy GameBoard and (later) enemy UI
         GameBoard enemyBoard = new GameBoard(BoardView.SIZE);

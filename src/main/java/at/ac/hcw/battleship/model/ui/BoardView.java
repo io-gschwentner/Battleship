@@ -1,19 +1,24 @@
 package at.ac.hcw.battleship.model.ui;
 
+import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.model.Ship;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 
-public class BoardView extends SuperBoardView{
+public class BoardView extends InteractiveBoardView{
+    protected final GameSetup setup;
 
     public BoardView(){
         super();
+        this.setup = new GameSetup();
     }
 
+    public GameSetup getSetup() {
+        return setup;
+    }
 
     protected void onCellClicked(int r, int c) {
 
