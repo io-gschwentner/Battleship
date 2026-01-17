@@ -18,6 +18,18 @@
     -fx-background-color: #1d3557;
 }
 
+.cell-button.cell-ship.no-hover:hover{
+    -fx-background-color: #0b5a8f;
+}
+
+.cell-button.cell-hit.no-hover:hover{
+    -fx-background-color: #b91c1c;
+}
+
+.cell-button.no-hover:hover{
+    -fx-background-color: #0f172a;
+}
+
 /* placed ship tiles */
 .cell-ship {
     -fx-background-color: #0b5a8f;
