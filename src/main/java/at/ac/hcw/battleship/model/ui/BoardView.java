@@ -12,27 +12,224 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
-public class BoardView extends SuperBoardView {
+public class BoardView {
+
+    public static final int SIZE = 10;
+    public static final int CELL_SIZE = 40;
+
+    private final GameBoard board;
+    private final GameSetup setup;
+    private final Button[][] cellButton;
+
+    private int shipIndex = 0;
+    private Ship currentShip;
+    private Label statusLabel;
+    private Button startGameButton;
 
     public BoardView(Stage stage) {
-        super(stage);
+        this.board = new GameBoard(SIZE);
+        this.setup = new GameSetup();
+        this.cellButton = new Button[SIZE][SIZE];
+
+        BorderPane root = createRoot();
+        Scene scene = new Scene(root, 500, 550);
+        stage.setScene(scene);
+        stage.setTitle("Place your ships");
+        stage.show();
+
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+        stage.setScene(scene);
+
     }
 
-    protected void onCellClicked(int r, int c) {
+    public GameBoard getBoard() {
+        return board;
+    }
+
+    public GameSetup getSetup() {
+        return setup;
+    }
+
+    // ---------- layout building ----------
+
+    private BorderPane createRoot() {
+        BorderPane root = new BorderPane();
+        root.setPadding(new Insets(10));
+
+        HBox topPanel = createColumnLabels();
+        VBox leftPanel = createRowLabels();
+        GridPane grid = createGrid();
+        HBox bottomPanel = createBottomPanel();
+
+        BorderPane.setAlignment(topPanel, Pos.CENTER_RIGHT);
+        BorderPane.setAlignment(leftPanel, Pos.CENTER_LEFT);
+        BorderPane.setAlignment(grid, Pos.CENTER);
+        BorderPane.setAlignment(bottomPanel, Pos.CENTER);
+
+        topPanel.setPrefHeight(25);
+        topPanel.setMaxHeight(25);
+        topPanel.setPadding(new Insets(50, 0, 0, 50));
+
+        leftPanel.setPadding(new Insets(0, 0, 0, 25));
+        grid.setPadding(new Insets(0, 25, 0, 0));
+        grid.setPrefSize(420, 420);
+        grid.setMaxSize(420, 420);
+
+        bottomPanel.setPadding(new Insets(0, 0, 50, 0));
+
+        BorderPane.setMargin(topPanel, new Insets(0, 0, 5, 0));
+        BorderPane.setMargin(leftPanel, new Insets(0, 0, 0, 5));
+        BorderPane.setMargin(bottomPanel, new Insets(5, 0, 0, 0));
+
+        root.setTop(topPanel);
+        root.setLeft(leftPanel);
+        root.setCenter(grid);
+        root.setBottom(bottomPanel);
+
+        return root;
+    }
+
+    private HBox createColumnLabels() {
+        HBox labels = new HBox();
+        labels.setAlignment(Pos.CENTER);
+
+        for (int col = 1; col <= SIZE; col++) {
+            Label label = new Label(String.valueOf(col));
+            label.setPrefSize(CELL_SIZE, 25);
+            label.setMinSize(CELL_SIZE, 25);
+            label.setMaxWidth(CELL_SIZE);
+            HBox.setHgrow(label, Priority.NEVER);
+            labels.getChildren().add(label);
+        }
+        return labels;
+    }
+
+    private VBox createRowLabels() {
+        VBox labels = new VBox(2);
+        labels.setAlignment(Pos.CENTER_RIGHT);
+        labels.setPadding(new Insets(5, 0, 5, 0));
+
+        for (int row = 0; row < SIZE; row++) {
+            char rowLetter = (char) ('A' + row);
+            Label label = new Label(String.valueOf(rowLetter));
+            label.setPrefSize(25, CELL_SIZE);
+            label.setMinSize(25, CELL_SIZE);
+            VBox.setVgrow(label, Priority.NEVER);
+            labels.getChildren().add(label);
+        }
+        return labels;
+    }
+
+    private HBox createBottomPanel() {
+        HBox statusBar = new HBox(10);
+        statusBar.getStyleClass().add("status-bar");
+        statusBar.setAlignment(Pos.CENTER);
+        statusBar.setPadding(new Insets(10));
+        statusBar.setPrefHeight(40);
+
+        statusLabel = new Label("Ready for ship placement!");
+        statusLabel.getStyleClass().add("status-label");
+
+        Button reset = new Button("Reset");
+        reset.setPrefSize(80, 30);
+        reset.setOnAction(e -> resetBoard());
+
+        Button rotate = new Button("Rotate");
+        rotate.setPrefSize(80,30);
+        rotate.setOnAction(e -> changeOrientation());
+
+        startGameButton = new Button("Start");
+        startGameButton.setPrefSize(60,30);
+        startGameButton.setDisable(true);
+        startGameButton.setOnAction(e-> startGame());
+
+        Region leftSpacer = new Region();
+        Region rightSpacer = new Region();
+        HBox.setHgrow(leftSpacer, Priority.ALWAYS);
+        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+
+        statusBar.getChildren().addAll(leftSpacer, statusLabel, rotate, reset, startGameButton, rightSpacer);
+
+        return statusBar;
+    }
+
+    private GridPane createGrid() {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(2);
+        grid.setVgap(2);
+
+        for (int row = 0; row < SIZE; row++) {
+            for (int col = 0; col < SIZE; col++) {
+                Button button = new Button();
+                button.setPrefSize(CELL_SIZE, CELL_SIZE);
+                button.setId(row + "," + col);
+
+                // add CSS style class for all cells
+                button.getStyleClass().add("cell-button");
+
+                cellButton[row][col] = button;
+
+                button.setOnAction(this::handleCellClick);
+
+                grid.add(button, col, row);
+            }
+        }
+        return grid;
+    }
+
+    // ---------- behavior ----------
+
+    private void handleCellClick(ActionEvent event) {
+        Button button = (Button) event.getSource();
+        String[] pos = button.getId().split(",");
+        int r = Integer.parseInt(pos[0]);
+        int c = Integer.parseInt(pos[1]);
+        onCellClicked(r, c);
+    }
+
+    private void resetBoard() {
+        board.clearBoard();
+        setup.resetBoard();
+        shipIndex = 0;
+        currentShip = null;
+
+        // SET PLACED = FALSE & HORIZONTAL = TRUE
+        for (Ship ship : setup.getShips()) {
+            ship.setPlaced(false);
+            ship.setHorizontal(true);
+        }
+
+        startGameButton.setDisable(true);
+
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                cellButton[r][c].getStyleClass().setAll("cell-button");
+            }
+        }
+
+        statusLabel.setText("Ready for ship placement!");
+    }
+
+
+    private void onCellClicked(int r, int c) {
 
         if (currentShip == null || currentShip.isPlaced()) {
             if (setup.allShipsPlaced()) {
+                startGameButton.setDisable(false);
                 statusLabel.setText("All ships have been placed!");
                 return;
             }
             currentShip = setup.getShips().get(shipIndex);
             shipIndex++;
-            statusLabel.setText("Place " + currentShip.getName());
+            statusLabel.setText("Place " + currentShip.toString());
             return;
         }
 
         int length = currentShip.getLength();
-        boolean horizontal = true; // TODO: make this dynamic later
+        boolean horizontal = currentShip.isHorizontal();
 
         boolean ok = board.placeShip(r, c, length, horizontal);
         if (!ok) {
@@ -41,20 +238,40 @@ public class BoardView extends SuperBoardView {
         }
 
         for (int i = 0; i < length; i++) {
-            int rr = r;
-            int cc = c + i;
+            int rr = horizontal ? r : r+ i;
+            int cc = horizontal ? c + i : c;
+
             if (rr >= 0 && rr < SIZE && cc >= 0 && cc < SIZE) {
                 cellButton[rr][cc].getStyleClass().add("cell-ship");
             }
         }
 
         currentShip.setPlaced(true);
-        statusLabel.setText(
-                currentShip.getName() + " placed at " + (char) ('A' + r) + (c + 1)
-        );
+//        statusLabel.setText(
+//                currentShip.getName() + " placed at " + (char) ('A' + r) + (c + 1));
+    }
 
-        // TODO:
-        //  - support vertical placement (use ship.isHorizontal())
-        //  - when all ships placed, notify Game to continue to battle phase
+    private void startGame() {
+        //disable placement
+        for (int r = 0; r <SIZE; r++){
+            for (int c= 0; c <SIZE; c++){
+                cellButton[r][c].setDisable(true);
+            }
+        }
+
+        //TODO: implement starting game
+    }
+
+    private void changeOrientation(){
+        if (currentShip == null || currentShip.isPlaced()){
+            if (setup.allShipsPlaced()) {
+                statusLabel.setText("All ships have been placed!");
+                return;
+            }
+            currentShip = setup.getShips().get(shipIndex);
+        }
+
+        currentShip.setHorizontal(!currentShip.isHorizontal());
+        statusLabel.setText("Place " + currentShip.toString());
     }
 }
