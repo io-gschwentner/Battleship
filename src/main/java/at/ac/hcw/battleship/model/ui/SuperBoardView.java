@@ -24,6 +24,7 @@ public abstract class SuperBoardView {
     protected int shipIndex = 0;
     protected Ship currentShip;
     protected Label statusLabel;
+    protected Button startGameButton;
 
     public SuperBoardView(Stage stage) {
         this.board = new GameBoard(SIZE);
@@ -53,7 +54,7 @@ public abstract class SuperBoardView {
 
     // ---------- layout building ----------
 
-    public BorderPane createRoot() {
+    private BorderPane createRoot() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
@@ -121,29 +122,7 @@ public abstract class SuperBoardView {
         return labels;
     }
 
-    private HBox createBottomPanel() {
-        HBox statusBar = new HBox(10);
-        statusBar.getStyleClass().add("status-bar");
-        statusBar.setAlignment(Pos.CENTER);
-        statusBar.setPadding(new Insets(10));
-        statusBar.setPrefHeight(40);
-
-        statusLabel = new Label("Ready for ship placement!");
-        statusLabel.getStyleClass().add("status-label");
-
-        Button reset = new Button("Reset");
-        reset.setPrefSize(80, 30);
-        reset.setOnAction(e -> resetBoard());
-
-        Region leftSpacer = new Region();
-        Region rightSpacer = new Region();
-        HBox.setHgrow(leftSpacer, Priority.ALWAYS);
-        HBox.setHgrow(rightSpacer, Priority.ALWAYS);
-
-        statusBar.getChildren().addAll(leftSpacer, statusLabel, reset, rightSpacer);
-
-        return statusBar;
-    }
+    abstract HBox createBottomPanel();
 
     private GridPane createGrid() {
         GridPane grid = new GridPane();
@@ -178,26 +157,6 @@ public abstract class SuperBoardView {
         int r = Integer.parseInt(pos[0]);
         int c = Integer.parseInt(pos[1]);
         onCellClicked(r, c);
-    }
-
-    private void resetBoard() {
-        board.clearBoard();
-        setup.resetBoard();
-        shipIndex = 0;
-        currentShip = null;
-
-        // ensure all ships in the new list have placed=false
-        for (Ship ship : setup.getShips()) {
-            ship.setPlaced(false);
-        }
-
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
-                cellButton[r][c].getStyleClass().setAll("cell-button");
-            }
-        }
-
-        statusLabel.setText("Ready for ship placement!");
     }
 
     abstract void onCellClicked(int r, int c);
