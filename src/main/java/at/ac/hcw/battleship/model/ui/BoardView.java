@@ -24,6 +24,7 @@ public class BoardView {
     private int shipIndex = 0;
     private Ship currentShip;
     private Label statusLabel;
+    private Button startGameButton;
 
     public BoardView(Stage stage) {
         this.board = new GameBoard(SIZE);
@@ -135,12 +136,21 @@ public class BoardView {
         reset.setPrefSize(80, 30);
         reset.setOnAction(e -> resetBoard());
 
+        Button rotate = new Button("Rotate");
+        rotate.setPrefSize(80,30);
+        rotate.setOnAction(e -> changeOrientation());
+
+        startGameButton = new Button("Start");
+        startGameButton.setPrefSize(60,30);
+        startGameButton.setDisable(true);
+        startGameButton.setOnAction(e-> startGame());
+
         Region leftSpacer = new Region();
         Region rightSpacer = new Region();
         HBox.setHgrow(leftSpacer, Priority.ALWAYS);
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
 
-        statusBar.getChildren().addAll(leftSpacer, statusLabel, reset, rightSpacer);
+        statusBar.getChildren().addAll(leftSpacer, statusLabel, rotate, reset, startGameButton, rightSpacer);
 
         return statusBar;
     }
@@ -186,10 +196,13 @@ public class BoardView {
         shipIndex = 0;
         currentShip = null;
 
-        // ensure all ships in the new list have placed=false
+        // SET PLACED = FALSE & HORIZONTAL = TRUE
         for (Ship ship : setup.getShips()) {
             ship.setPlaced(false);
+            ship.setHorizontal(true);
         }
+
+        startGameButton.setDisable(true);
 
         for (int r = 0; r < SIZE; r++) {
             for (int c = 0; c < SIZE; c++) {
@@ -205,17 +218,18 @@ public class BoardView {
 
         if (currentShip == null || currentShip.isPlaced()) {
             if (setup.allShipsPlaced()) {
+                startGameButton.setDisable(false);
                 statusLabel.setText("All ships have been placed!");
                 return;
             }
             currentShip = setup.getShips().get(shipIndex);
             shipIndex++;
-            statusLabel.setText("Place " + currentShip.getName());
+            statusLabel.setText("Place " + currentShip.toString());
             return;
         }
 
         int length = currentShip.getLength();
-        boolean horizontal = true; // TODO: make this dynamic later
+        boolean horizontal = currentShip.isHorizontal();
 
         boolean ok = board.placeShip(r, c, length, horizontal);
         if (!ok) {
@@ -224,20 +238,40 @@ public class BoardView {
         }
 
         for (int i = 0; i < length; i++) {
-            int rr = r;
-            int cc = c + i;
+            int rr = horizontal ? r : r+ i;
+            int cc = horizontal ? c + i : c;
+
             if (rr >= 0 && rr < SIZE && cc >= 0 && cc < SIZE) {
                 cellButton[rr][cc].getStyleClass().add("cell-ship");
             }
         }
 
         currentShip.setPlaced(true);
-        statusLabel.setText(
-                currentShip.getName() + " placed at " + (char) ('A' + r) + (c + 1)
-        );
+//        statusLabel.setText(
+//                currentShip.getName() + " placed at " + (char) ('A' + r) + (c + 1));
+    }
 
-        // TODO:
-        //  - support vertical placement (use ship.isHorizontal())
-        //  - when all ships placed, notify Game to continue to battle phase
+    private void startGame() {
+        //disable placement
+        for (int r = 0; r <SIZE; r++){
+            for (int c= 0; c <SIZE; c++){
+                cellButton[r][c].setDisable(true);
+            }
+        }
+
+        //TODO: implement starting game
+    }
+
+    private void changeOrientation(){
+        if (currentShip == null || currentShip.isPlaced()){
+            if (setup.allShipsPlaced()) {
+                statusLabel.setText("All ships have been placed!");
+                return;
+            }
+            currentShip = setup.getShips().get(shipIndex);
+        }
+
+        currentShip.setHorizontal(!currentShip.isHorizontal());
+        statusLabel.setText("Place " + currentShip.toString());
     }
 }

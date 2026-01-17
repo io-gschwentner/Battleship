@@ -10,6 +10,7 @@ public class Ship {
     public Ship(String name, int length){
         this.name = name;
         this.length = length;
+        this.horizontal = true;
     }
 
     public String getName() {
@@ -34,5 +35,10 @@ public class Ship {
 
     public boolean isHorizontal() {
         return horizontal;
+    }
+
+    @Override
+    public String toString (){
+        return name + " (" + length + (isHorizontal() ? " Horizontal)" : " Vertical)");
     }
 }
