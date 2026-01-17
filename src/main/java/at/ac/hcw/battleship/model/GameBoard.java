@@ -1,17 +1,9 @@
 package at.ac.hcw.battleship.model;
 
 
+import at.ac.hcw.battleship.model.enums.CellState;
 
 public class GameBoard {
-
-    // enums for defining the cell state
-    public enum CellState {
-        EMPTY,          //no ship, not shot
-        SHIP,           //ship, not hit
-        HIT,            //ship & hit
-        MISS            //shot, no ship
-    }
-
     private final int size;
     private final CellState[][] grid;
 
@@ -81,5 +73,24 @@ public class GameBoard {
             }
         }
         return count;
+    }
+
+    public CellState fireAt(int row, int col) {
+        if (!inBounds(row, col)) {
+            throw new IllegalArgumentException("Shot out of bounds");
+        }
+
+        if (grid[row][col] == CellState.SHIP) {
+            grid[row][col] = CellState.HIT;
+            return CellState.HIT;
+        }
+
+        if (grid[row][col] == CellState.EMPTY) {
+            grid[row][col] = CellState.MISS;
+            return CellState.MISS;
+        }
+
+        // already shot here
+        return grid[row][col];
     }
 }
