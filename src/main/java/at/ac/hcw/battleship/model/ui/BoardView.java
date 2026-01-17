@@ -10,8 +10,8 @@ import javafx.stage.Stage;
 
 public class BoardView extends SuperBoardView{
 
-    public BoardView(Stage stage){
-        super(stage);
+    public BoardView(){
+        super();
     }
 
 

@@ -26,22 +26,10 @@ public abstract class SuperBoardView {
     protected Label statusLabel;
     protected Button startGameButton;
 
-    public SuperBoardView(Stage stage) {
+    public SuperBoardView() {
         this.board = new GameBoard(SIZE);
         this.setup = new GameSetup();
         this.cellButton = new Button[SIZE][SIZE];
-
-        BorderPane root = createRoot();
-        Scene scene = new Scene(root, 500, 550);
-        stage.setScene(scene);
-        stage.setTitle("Place your ships");
-        stage.show();
-
-        scene.getStylesheets().add(
-                getClass().getResource("/styles.css").toExternalForm()
-        );
-        stage.setScene(scene);
-
     }
 
     public GameBoard getBoard() {
@@ -54,7 +42,7 @@ public abstract class SuperBoardView {
 
     // ---------- layout building ----------
 
-    private BorderPane createRoot() {
+    public BorderPane createRoot() {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10));
 
