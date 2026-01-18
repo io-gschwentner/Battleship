@@ -1,6 +1,6 @@
 package at.ac.hcw.battleship.players;
 
-import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.Targetable;
 import at.ac.hcw.battleship.model.enums.CellState;
 import at.ac.hcw.battleship.model.enums.KnownCellState;
 import java.util.*;
@@ -18,11 +18,9 @@ public class MediumAiPlayer implements Player {
     }
 
     @Override
-    public void takeTurn(GameBoard enemyBoard) { //checkerboard and sink strat
+    public void takeTurn(Targetable targetableGameBoard) { //checkerboard and sink strat
         Coord shot = chooseShot();
-
-        CellState result = enemyBoard.fireAt(shot.row, shot.col);
-
+        CellState result = targetableGameBoard.fireAt(shot.row, shot.col);
         processResult(shot, result);
     }
 
@@ -30,13 +28,13 @@ public class MediumAiPlayer implements Player {
         if (!targetQueue.isEmpty()) {
             return targetQueue.poll();
         }
-
         return huntShot();
     }
 
     private Coord huntShot() {
         List<Coord> candidates = new ArrayList<>();
 
+        //checkerboard (hunt for 1x2 ships)
         for (int row = 0; row < gameState.getSize(); row++) {
             for (int col = 0; col < gameState.getSize(); col++) {
                 if (gameState.getCell(row, col) == KnownCellState.UNKNOWN
@@ -56,7 +54,6 @@ public class MediumAiPlayer implements Player {
                 }
             }
         }
-
         return candidates.get(random.nextInt(candidates.size()));
     }
 
@@ -64,11 +61,15 @@ public class MediumAiPlayer implements Player {
         if (result == CellState.HIT) {
             gameState.setCell(shot.row, shot.col, KnownCellState.HIT);
             enqueueAdjacent(shot);
+        } else if (result == CellState.SUNK) {
+            gameState.setCell(shot.row, shot.col, KnownCellState.HIT);
+            targetQueue.clear();
         } else if (result == CellState.MISS) {
             gameState.setCell(shot.row, shot.col, KnownCellState.MISS);
         }
     }
 
+    //TODO: make smarter (if two horizontally, stay horizontally ...)
     private void enqueueAdjacent(Coord hit) {
         int[][] dirs = {
                 {-1, 0}, {1, 0},
@@ -83,7 +84,6 @@ public class MediumAiPlayer implements Player {
                 targetQueue.add(new Coord(nextRow, nextCol));
             }
         }
-        //TODO: if sunk clear queue
     }
 
     private boolean inBounds(int row, int col) {

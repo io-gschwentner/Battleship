@@ -1,17 +1,23 @@
 package at.ac.hcw.battleship.model;
 
 import at.ac.hcw.battleship.model.enums.CellState;
+import at.ac.hcw.battleship.players.Coord;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-public class GameBoard {
+import java.util.ArrayList;
+import java.util.List;
+
+public class GameBoard implements Targetable{
     private final int size;
     private final ObjectProperty<CellState>[][] grid;
+    private final List<Ship> ships;
 
     @SuppressWarnings("unchecked")
     public GameBoard(int size) {
         this.size = size;
         this.grid = new ObjectProperty[size][size];
+        ships = new ArrayList<>();
         clearBoard();
     }
 
@@ -62,11 +68,14 @@ public class GameBoard {
         }
 
         //place ship
+        Ship newShip = new Ship("Ship", length);
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
                 grid[r][c].set(CellState.SHIP);
+                newShip.addCoordinate(new Coord(r, c));
             }
         }
+        ships.add(newShip);
         return true;
     }
     public int getRemainingShipCells() {
@@ -87,8 +96,21 @@ public class GameBoard {
         }
 
         if (grid[row][col].get() == CellState.SHIP) {
-            grid[row][col].set(CellState.HIT);
-            return CellState.HIT;
+            if(ships.stream().findFirst().isPresent()) {
+                grid[row][col].set(CellState.HIT);
+                Ship ship = ships.stream().findFirst().get();
+                ship.addHit();
+                if(ship.isSunk()){
+                    for(Coord coordinate : ship.getCoordinates()){
+                        grid[coordinate.row][coordinate.col].set(CellState.SUNK);
+                    }
+                    return CellState.SUNK;
+                }
+                return CellState.HIT;
+            }
+            else {
+                throw new RuntimeException();
+            }
         }
 
         if (grid[row][col].get() == CellState.EMPTY) {

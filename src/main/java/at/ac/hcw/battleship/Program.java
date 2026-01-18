@@ -3,8 +3,10 @@ package at.ac.hcw.battleship;
 
 import at.ac.hcw.battleship.logic.Game;
 import at.ac.hcw.battleship.logic.GameSetup;
+import at.ac.hcw.battleship.model.ui.BattleshipGameView;
 import at.ac.hcw.battleship.model.ui.BoardView;
 import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.ui.EnemyBoardView;
 import at.ac.hcw.battleship.model.ui.PlayerBoardView;
 import at.ac.hcw.battleship.players.EasyAiPlayer;
 import at.ac.hcw.battleship.players.HumanPlayer;
@@ -13,6 +15,8 @@ import at.ac.hcw.battleship.players.Player;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Program extends Application {
@@ -20,14 +24,19 @@ public class Program extends Application {
     @Override
     public void start(Stage stage) {
         // Player setup UI
-//        GameBoard test = new GameBoard(10);
-//        test.placeShip(2,3,4,true);
-//        PlayerBoardView playerView = new PlayerBoardView(test);
+        GameBoard test = new GameBoard(10);
+        test.placeShip(5,3,4,true);
 
-        BoardView playerView = new BoardView();
+        GameBoard test2 = new GameBoard(10);
+        test2.placeShip(2,3,4,true);
 
-        BorderPane root = playerView.createRoot();
-        Scene scene = new Scene(root, 500, 550);
+        var view = new BattleshipGameView(test, test2);
+
+        //BoardView playerView = new BoardView();
+
+        //BorderPane root = playerView.createRoot();
+        HBox root = view.createRoot();
+        Scene scene = new Scene(root, 1000, 550);
         stage.setTitle("Place your ships");
 
         scene.getStylesheets().add(
@@ -36,8 +45,6 @@ public class Program extends Application {
         stage.setScene(scene);
         stage.show();
 
-
-        GameBoard playerBoard = playerView.getBoard();
 
         // TODO: create enemy GameBoard and (later) enemy UI
         GameBoard enemyBoard = new GameBoard(BoardView.SIZE);

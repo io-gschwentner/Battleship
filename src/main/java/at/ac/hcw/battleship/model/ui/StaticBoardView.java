@@ -30,7 +30,7 @@ public abstract class StaticBoardView extends SuperBoardView{
                 // binding
                 board.cellProperty(row, col).addListener((obs, oldState, newState) -> {
                     button.getStyleClass().removeAll(
-                            "cell-empty", "cell-ship", "cell-hit", "cell-miss"
+                            "cell-empty", "cell-ship", "cell-hit", "cell-miss", "cell-sunk"
                     );
 
                     switch (newState) {
@@ -38,6 +38,7 @@ public abstract class StaticBoardView extends SuperBoardView{
                         case SHIP  -> button.getStyleClass().add("cell-ship");
                         case HIT   -> button.getStyleClass().add("cell-hit");
                         case MISS  -> button.getStyleClass().add("cell-miss");
+                        case SUNK  -> button.getStyleClass().add("cell-sunk");
                     }
                 });
 
@@ -47,6 +48,7 @@ public abstract class StaticBoardView extends SuperBoardView{
                     case SHIP  -> button.getStyleClass().add("cell-ship");
                     case HIT   -> button.getStyleClass().add("cell-hit");
                     case MISS  -> button.getStyleClass().add("cell-miss");
+                    case SUNK  -> button.getStyleClass().add("cell-sunk");
                 }
 
                 cellButton[row][col] = button;
