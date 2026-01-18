@@ -20,11 +20,11 @@ public class Program extends Application {
     @Override
     public void start(Stage stage) {
         // Player setup UI
-        GameBoard test = new GameBoard(10);
-        test.placeShip(2,3,4,true);
-        PlayerBoardView playerView = new PlayerBoardView(test);
+//        GameBoard test = new GameBoard(10);
+//        test.placeShip(2,3,4,true);
+//        PlayerBoardView playerView = new PlayerBoardView(test);
 
-        //BoardView playerView = new BoardView();
+        BoardView playerView = new BoardView();
 
         BorderPane root = playerView.createRoot();
         Scene scene = new Scene(root, 500, 550);
@@ -35,6 +35,7 @@ public class Program extends Application {
         );
         stage.setScene(scene);
         stage.show();
+
 
         GameBoard playerBoard = playerView.getBoard();
 

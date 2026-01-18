@@ -27,8 +27,29 @@ public abstract class StaticBoardView extends SuperBoardView{
                 button.getStyleClass().add("cell-button");
                 button.getStyleClass().add("no-hover");
 
-                cellButton[row][col] = button;
+                // binding
+                board.cellProperty(row, col).addListener((obs, oldState, newState) -> {
+                    button.getStyleClass().removeAll(
+                            "cell-empty", "cell-ship", "cell-hit", "cell-miss"
+                    );
 
+                    switch (newState) {
+                        case EMPTY -> button.getStyleClass().add("cell-empty");
+                        case SHIP  -> button.getStyleClass().add("cell-ship");
+                        case HIT   -> button.getStyleClass().add("cell-hit");
+                        case MISS  -> button.getStyleClass().add("cell-miss");
+                    }
+                });
+
+                // initialize once
+                switch (board.getCell(row, col)) {
+                    case EMPTY -> button.getStyleClass().add("cell-empty");
+                    case SHIP  -> button.getStyleClass().add("cell-ship");
+                    case HIT   -> button.getStyleClass().add("cell-hit");
+                    case MISS  -> button.getStyleClass().add("cell-miss");
+                }
+
+                cellButton[row][col] = button;
                 grid.add(button, col, row);
             }
         }

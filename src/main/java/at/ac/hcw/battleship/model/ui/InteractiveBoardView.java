@@ -22,9 +22,31 @@ public abstract class InteractiveBoardView extends SuperBoardView {
                 // add CSS style class for all cells
                 button.getStyleClass().add("cell-button");
 
-                cellButton[row][col] = button;
-
                 button.setOnAction(this::handleCellClick);
+
+                // binding
+                board.cellProperty(row, col).addListener((obs, oldState, newState) -> {
+                    button.getStyleClass().removeAll(
+                            "cell-empty", "cell-ship", "cell-hit", "cell-miss"
+                    );
+
+                    switch (newState) {
+                        case EMPTY -> button.getStyleClass().add("cell-empty");
+                        case SHIP  -> button.getStyleClass().add("cell-ship");
+                        case HIT   -> button.getStyleClass().add("cell-hit");
+                        case MISS  -> button.getStyleClass().add("cell-miss");
+                    }
+                });
+
+                // initialize once
+                switch (board.getCell(row, col)) {
+                    case EMPTY -> button.getStyleClass().add("cell-empty");
+                    case SHIP  -> button.getStyleClass().add("cell-ship");
+                    case HIT   -> button.getStyleClass().add("cell-hit");
+                    case MISS  -> button.getStyleClass().add("cell-miss");
+                }
+
+                cellButton[row][col] = button;
 
                 grid.add(button, col, row);
             }

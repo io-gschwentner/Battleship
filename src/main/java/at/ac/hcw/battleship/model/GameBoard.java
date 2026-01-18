@@ -1,16 +1,17 @@
 package at.ac.hcw.battleship.model;
 
-
 import at.ac.hcw.battleship.model.enums.CellState;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 public class GameBoard {
     private final int size;
-    private final CellState[][] grid;
+    private final ObjectProperty<CellState>[][] grid;
 
-
+    @SuppressWarnings("unchecked")
     public GameBoard(int size) {
         this.size = size;
-        this.grid = new CellState[size][size];
+        this.grid = new ObjectProperty[size][size];
         clearBoard();
     }
 
@@ -18,16 +19,21 @@ public class GameBoard {
         return size;
     }
 
+    // Property access (important for binding)
+    public ObjectProperty<CellState> cellProperty(int row, int col) {
+        return grid[row][col];
+    }
+
     //get the cell state
     public CellState getCell(int row, int col) {
-        return grid[row][col];
+        return grid[row][col].get();
     }
 
     //set every cell to EMPTY
     public void clearBoard() {
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
-                grid[r][c] = CellState.EMPTY;
+                grid[r][c] = new SimpleObjectProperty<>(CellState.EMPTY);
             }
         }
     }
@@ -49,7 +55,7 @@ public class GameBoard {
         //validation (EMPTY?)
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
-                if (grid[r][c] != CellState.EMPTY) {
+                if (grid[r][c].get() != CellState.EMPTY) {
                     return false;
                 }
             }
@@ -58,7 +64,7 @@ public class GameBoard {
         //place ship
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
-                grid[r][c] = CellState.SHIP;
+                grid[r][c].set(CellState.SHIP);
             }
         }
         return true;
@@ -67,7 +73,7 @@ public class GameBoard {
         int count = 0;
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
-                if (grid[r][c] == CellState.SHIP) {
+                if (grid[r][c].get() == CellState.SHIP) {
                     count++;
                 }
             }
@@ -80,17 +86,17 @@ public class GameBoard {
             throw new IllegalArgumentException("Shot out of bounds");
         }
 
-        if (grid[row][col] == CellState.SHIP) {
-            grid[row][col] = CellState.HIT;
+        if (grid[row][col].get() == CellState.SHIP) {
+            grid[row][col].set(CellState.HIT);
             return CellState.HIT;
         }
 
-        if (grid[row][col] == CellState.EMPTY) {
-            grid[row][col] = CellState.MISS;
+        if (grid[row][col].get() == CellState.EMPTY) {
+            grid[row][col].set(CellState.MISS);
             return CellState.MISS;
         }
 
         // already shot here
-        return grid[row][col];
+        return grid[row][col].get();
     }
 }
