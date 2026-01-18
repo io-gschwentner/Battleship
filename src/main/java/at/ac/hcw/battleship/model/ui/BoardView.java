@@ -43,15 +43,6 @@ public class BoardView extends InteractiveBoardView{
             return;
         }
 
-        for (int i = 0; i < length; i++) {
-            int rr = horizontal ? r : r+ i;
-            int cc = horizontal ? c + i : c;
-
-            if (rr >= 0 && rr < SIZE && cc >= 0 && cc < SIZE) {
-                cellButton[rr][cc].getStyleClass().add("cell-ship");
-            }
-        }
-
         currentShip.setPlaced(true);
 //        statusLabel.setText(
 //                currentShip.getName() + " placed at " + (char) ('A' + r) + (c + 1));
@@ -103,12 +94,6 @@ public class BoardView extends InteractiveBoardView{
         }
 
         startGameButton.setDisable(true);
-
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
-                cellButton[r][c].getStyleClass().setAll("cell-button");
-            }
-        }
 
         statusLabel.setText("Ready for ship placement!");
     }
