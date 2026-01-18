@@ -1,6 +1,7 @@
 package at.ac.hcw.battleship.players;
 
 import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.Targetable;
 import at.ac.hcw.battleship.model.enums.CellState;
 
 import java.util.Scanner;
@@ -11,25 +12,11 @@ public class HumanPlayer implements Player{
     public HumanPlayer() { }
 
     @Override
-    public void takeTurn(GameBoard enemyBoard) {
-        int row;
-        int col;
+    public void takeTurn(Targetable targetableGameBoard) {
+        int row = 0;
+        int col = 0;
 
-        while (true) {
-            System.out.print("Enter row: ");
-            row = scanner.nextInt();
-
-            System.out.print("Enter column: ");
-            col = scanner.nextInt();
-
-            if (isValidShot(enemyBoard, row, col)) {
-                break;
-            }
-
-            System.out.println("Invalid shot. Try again.");
-        }
-
-        CellState result = enemyBoard.fireAt(row, col);
+        CellState result = targetableGameBoard.fireAt(row, col);
 
         displayShotResult(result);
     }

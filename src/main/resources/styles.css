@@ -26,6 +26,10 @@
     -fx-background-color: #b91c1c;
 }
 
+.cell-button.cell-sunk.no-hover:hover{
+    -fx-background-color: #4d0101;
+}
+
 .cell-button.no-hover:hover{
     -fx-background-color: #0f172a;
 }
@@ -42,6 +46,10 @@
 
 .cell-miss {
     -fx-background-color: #e5e7eb;
+}
+
+.cell-sunk {
+    -fx-background-color: #4d0101;
 }
 
 /* status bar */
