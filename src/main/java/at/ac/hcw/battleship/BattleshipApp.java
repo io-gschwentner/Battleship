@@ -6,9 +6,7 @@ import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.Ship;
 import at.ac.hcw.battleship.model.enums.GameMode;
-import at.ac.hcw.battleship.model.ui.BattleshipGameView;
-import at.ac.hcw.battleship.model.ui.BoardView;
-import at.ac.hcw.battleship.model.ui.EnemyBoardView;
+import at.ac.hcw.battleship.model.ui.*;
 import at.ac.hcw.battleship.players.*;
 import at.ac.hcw.battleship.logic.RandomShipPlacement;
 import javafx.application.Application;
@@ -25,7 +23,9 @@ import java.util.List;
 
 public class BattleshipApp extends Application {
 
-    // default: Easy AI
+    private static final int WIDTH = 1200;
+    private static final int HEIGHT = 550;
+
     private GameMode gameMode = GameMode.EASY_AI;
 
     @Override
@@ -33,127 +33,180 @@ public class BattleshipApp extends Application {
         showSplash(stage);
     }
 
-    // ---------- Splash screen ----------
+    // ---------- Splash ----------
 
     private void showSplash(Stage stage) {
-        VBox root = new VBox(20);
-        root.setAlignment(Pos.CENTER);
-
-        Label title = new Label("Battleship");
-        title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
-
-        Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> showPlacementScene(stage));
-
-        root.getChildren().addAll(title, startButton);
-
-        Scene scene = new Scene(root, 600, 400);
-        scene.getStylesheets().add(
-                getClass().getResource("/styles.css").toExternalForm()
+        VBox root = createCenteredVBox(20,
+                styledLabel("Battleship", 32),
+                createButton("Start Game", () -> showGamemodeScene(stage))
         );
-
-        stage.setTitle("Battleship");
-        stage.setScene(scene);
-        stage.show();
+        setScene(stage, root, 600, 400, "Battleship");
     }
 
-    // ---------- Placement scene ----------
+    // ---------- Menu ----------
 
-    private void showPlacementScene(Stage stage) {
+    private void showGamemodeScene(Stage stage) {
+        VBox root = createCenteredVBox(20,
+                styledLabel("Battleship", 32),
+                createButton("Easy", () -> startPlacement(stage, GameMode.EASY_AI)),
+                createButton("Medium", () -> startPlacement(stage, GameMode.MEDIUM_AI)),
+                createButton("vs Human", () -> startPlacement(stage, GameMode.TWO_PLAYERS))
+        );
+        setScene(stage, root, 600, 400, "Battleship");
+    }
+
+    private void startPlacement(Stage stage, GameMode mode) {
+        this.gameMode = mode;
+
+        if (mode == GameMode.TWO_PLAYERS) {
+            continueMultiplayerPlacement(stage);
+        } else {
+            startSinglePlacement(stage);
+        }
+    }
+
+    // ---------- Placement ----------
+
+    private void startSinglePlacement(Stage stage) {
         BoardView setupView = new BoardView();
         BorderPane root = setupView.createRoot();
 
-        Scene scene = new Scene(root, 1000, 550);
-        scene.getStylesheets().add(
-                getClass().getResource("/styles.css").toExternalForm()
-        );
-
-        stage.setTitle("Battleship – Place your ships");
-        stage.setScene(scene);
-        stage.show();
+        setScene(stage, root, 1000, HEIGHT, "Place your ships");
 
         setupView.setOnStartGame(() ->
-                startGameScene(stage, setupView.getBoard()));
+                startAiGame(stage, setupView.getBoard()));
     }
 
-    // ---------- Game scene ----------
+    private void continueMultiplayerPlacement(Stage stage) {
+        BoardView p1View = new BoardView();
+        setScene(stage, p1View.createRoot(), 1000, HEIGHT,
+                "Player 1 – Place your ships");
 
-    private void startGameScene(Stage stage, GameBoard player1Board) {
-        GameBoard player2Board = new GameBoard(BoardView.SIZE);
-        placeEnemyShips(player2Board);
+        p1View.setOnStartGame(() ->
+                continueMultiplayerPlacement(stage, p1View.getBoard()));
+    }
 
-        Player humanPlayer = new HumanPlayer();
-        Player opponent = createOpponent();
+    private void continueMultiplayerPlacement(Stage stage, GameBoard p1Board) {
+        BoardView p2View = new BoardView();
+        setScene(stage, p2View.createRoot(), 1000, HEIGHT,
+                "Player 2 – Place your ships");
 
-        Game game = new Game(humanPlayer, opponent, player1Board, player2Board);
+        p2View.setOnStartGame(() ->
+                startMultiplayerGame(stage, p1Board, p2View.getBoard()));
+    }
 
-        BattleshipGameView gameView = new BattleshipGameView(player1Board, player2Board);
-        HBox root = gameView.createRoot();
+    // ---------- Game Start ----------
 
-        Scene scene = new Scene(root, 1000, 550);
-        scene.getStylesheets().add(
-                getClass().getResource("/styles.css").toExternalForm()
+    private void startAiGame(Stage stage, GameBoard playerBoard) {
+        GameBoard enemyBoard = new GameBoard(BoardView.SIZE);
+        placeEnemyShips(enemyBoard);
+
+        Game game = new Game(
+                new HumanPlayer(),
+                createOpponent(),
+                playerBoard,
+                enemyBoard
         );
 
-        stage.setTitle("Battleship – Game");
-        stage.setScene(scene);
-        stage.show();
+        AiBattleshipGameView view =
+                new AiBattleshipGameView(playerBoard, enemyBoard);
 
-        final int[] hits = {0};
-        final int[] misses = {0};
+        setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
 
-        gameView.updateStats(hits[0], misses[0], player2Board.getRemainingShipCells());
-        gameView.setStatus("Your turn");
+        setupAiHandlers(view, game, enemyBoard);
+    }
 
-        EnemyBoardView enemyView = gameView.getEnemyBoardView();
-        gameView.setEnemyBoardDisabled(false);
+    private void startMultiplayerGame(Stage stage,
+                                      GameBoard p1Board,
+                                      GameBoard p2Board) {
 
-        enemyView.setOnHumanShot(coord -> {
-            System.out.println("Enemy cell clicked: " + coord.row + "," + coord.col);
-            handleHumanShot(coord, game, player2Board, hits, misses, gameView);
+        Game game = new Game(
+                new HumanPlayer(),
+                new HumanPlayer(),
+                p1Board,
+                p2Board
+        );
+
+        MultiplayerBattleshipGameView view =
+                new MultiplayerBattleshipGameView(p1Board, p2Board);
+
+        setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
+
+        setupMultiplayerHandlers(view, game, p1Board, p2Board);
+    }
+
+    // ---------- Turn Handling ----------
+
+    private void setupAiHandlers(AiBattleshipGameView view,
+                                 Game game,
+                                 GameBoard enemyBoard) {
+
+        int hits = 0;
+        int misses = 0;
+
+        view.updateStats(0, 0, enemyBoard.getRemainingShipCells());
+        view.setStatus("Your turn");
+
+        view.getEnemyBoardView().setOnHumanShot(coord -> {
+            if (handleShot(coord, game, enemyBoard, hits, misses, view)) {
+                view.setStatus("Enemy taking turn");
+                game.playTurn(); // AI turn
+                view.setEnemyBoardDisabled(false);
+                view.setStatus("Your turn");
+            }
         });
     }
 
-    private void handleHumanShot(Coord coord,
-                                 Game game,
-                                 GameBoard enemyBoard,
-                                 int[] hits,
-                                 int[] misses,
-                                 BattleshipGameView view) {
+    private void setupMultiplayerHandlers(MultiplayerBattleshipGameView view,
+                                          Game game,
+                                          GameBoard p1Board,
+                                          GameBoard p2Board) {
+
+        int hits = 0;
+        int misses = 0;
+
+        view.setPlayer1BoardDisabled(true);
+
+        view.getPlayer2BoardView().setOnHumanShot(coord ->{
+            view.swapDisabledBoard();
+            handleShot(coord, game, p2Board, hits, misses, view);
+        });
+
+        view.getPlayer1BoardView().setOnHumanShot(coord -> {
+            view.swapDisabledBoard();
+            handleShot(coord, game, p1Board, hits, misses, view);
+        });
+    }
+
+    private boolean handleShot(Coord coord,
+                               Game game,
+                               GameBoard enemyBoard,
+                               int hits,
+                               int misses,
+                               BattleshipGameView view) {
 
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
-            return;
+            return false;
         }
-
-        // Disable enemy board so the player cannot click twice
-        view.setEnemyBoardDisabled(true);
 
         var result = enemyBoard.fireAt(coord.row, coord.col);
 
         switch (result) {
-            case HIT, SUNK -> hits[0]++;
-            case MISS -> misses[0]++;
-            default -> { }
+            case HIT, SUNK -> hits++;
+            case MISS -> misses++;
         }
 
-        view.updateStats(hits[0], misses[0], enemyBoard.getRemainingShipCells());
+        view.updateStats(hits, misses,
+                enemyBoard.getRemainingShipCells());
 
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
-            return;
+            return false;
         }
 
-        // AI turn
         game.playTurn();
-
-        if (isFinished(game)) {
-            view.setStatus(gameResultText(game));
-        } else {
-            view.setStatus("Your turn");
-            // Re-enable enemy board for the next human shot
-            view.setEnemyBoardDisabled(false);
-        }
+        return true;
     }
 
     // ---------- Helpers ----------
@@ -167,8 +220,7 @@ public class BattleshipApp extends Application {
     }
 
     /**
-     * Simple fixed placement for AI ships (same fleet size as player).
-     * Can be improved to random placement later.
+     * Generated placement for AI ships (same fleet size as player).
      */
     private void placeEnemyShips(GameBoard enemyBoard) {
 
@@ -191,6 +243,39 @@ public class BattleshipApp extends Application {
             case DRAW         -> "Game over – Draw";
             default           -> "Game over";
         };
+    }
+
+    private void setScene(Stage stage,
+                          javafx.scene.Parent root,
+                          int w,
+                          int h,
+                          String title) {
+        Scene scene = new Scene(root, w, h);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+        stage.setTitle(title);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private VBox createCenteredVBox(int spacing, javafx.scene.Node... nodes) {
+        VBox box = new VBox(spacing, nodes);
+        box.setAlignment(Pos.CENTER);
+        return box;
+    }
+
+    private Button createButton(String text, Runnable action) {
+        Button btn = new Button(text);
+        btn.setOnAction(e -> action.run());
+        return btn;
+    }
+
+    private Label styledLabel(String text, int size) {
+        Label label = new Label(text);
+        label.setStyle("-fx-text-fill: white; -fx-font-size: " + size +
+                "px; -fx-font-weight: bold;");
+        return label;
     }
 
     public static void main(String[] args) {

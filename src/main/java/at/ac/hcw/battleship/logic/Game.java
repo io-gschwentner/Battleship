@@ -43,7 +43,6 @@ public class Game {
         if (isFinished()) {
             return;
         }
-
         if (activePlayer == player1) {
             activePlayer.takeTurn(player2Board);
             activePlayer = player2;
