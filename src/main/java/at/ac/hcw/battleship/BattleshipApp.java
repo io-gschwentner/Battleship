@@ -113,6 +113,8 @@ public class BattleshipApp extends Application {
 
         setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
 
+        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
+
         setupAiHandlers(view, game, enemyBoard);
     }
 
@@ -131,6 +133,8 @@ public class BattleshipApp extends Application {
                 new MultiplayerBattleshipGameView(p1Board, p2Board);
 
         setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
+
+        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
 
         setupMultiplayerHandlers(view, game, p1Board, p2Board);
     }
