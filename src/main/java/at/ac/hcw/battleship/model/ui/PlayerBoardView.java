@@ -8,15 +8,10 @@ import javafx.scene.layout.HBox;
 /**
  * Read‑only view of the player's own board during the game.
  */
-public class PlayerBoardView extends InteractiveBoardView {
+public class PlayerBoardView extends StaticBoardView {
 
     public PlayerBoardView(GameBoard gameBoard) {
         super(gameBoard);
-    }
-
-    @Override
-    protected void onCellClicked(int row, int col) {
-        // Do nothing; player board is read‑only during the game.
     }
 
     @Override
