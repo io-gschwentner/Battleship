@@ -26,7 +26,7 @@ public class GameBoard implements Targetable {
         this.size = size;
         this.grid = new ObjectProperty[size][size];
         this.ships = new ArrayList<>();
-        clearBoard();
+        initializeBoard();
     }
 
     public int getSize() {
@@ -54,6 +54,14 @@ public class GameBoard implements Targetable {
      */
     public void clearBoard() {
         ships.clear();
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                grid[r][c].set(CellState.EMPTY);
+            }
+        }
+    }
+
+    private void initializeBoard(){
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
                 grid[r][c] = new SimpleObjectProperty<>(CellState.EMPTY);
