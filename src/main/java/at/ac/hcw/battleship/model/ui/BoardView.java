@@ -37,21 +37,10 @@ public class BoardView extends InteractiveBoardView {
 
     @Override
     protected void onCellClicked(int row, int col) {
-        if (currentShip == null || currentShip.isPlaced()) {
-            if (setup.allShipsPlaced()) {
-                startGameButton.setDisable(false);
-                statusLabel.setText("All ships have been placed!");
-                return;
-            }
-            if (shipIndex >= setup.getShips().size()) {
-                statusLabel.setText("No more ships to place.");
-                return;
-            }
+        if (currentShip == null){
             currentShip = setup.getShips().get(shipIndex);
-            shipIndex++;
-            statusLabel.setText("Place " + currentShip);
-            return;
-        }
+            statusLabel.setText("Place " + currentShip.toString());
+       }
 
         int length = currentShip.getLength();
         boolean horizontal = currentShip.isHorizontal();
@@ -64,10 +53,18 @@ public class BoardView extends InteractiveBoardView {
 
         currentShip.setPlaced(true);
 
+//        next ship
+        shipIndex++;
+        currentShip = null;
+
         if (setup.allShipsPlaced()) {
             startGameButton.setDisable(false);
             statusLabel.setText("All ships have been placed!");
+            return;
         }
+
+        currentShip = setup.getShips().get(shipIndex);
+        statusLabel.setText("Place " + currentShip.toString());
     }
 
     @Override
@@ -78,7 +75,8 @@ public class BoardView extends InteractiveBoardView {
         statusBar.setPadding(new Insets(10));
         statusBar.setPrefHeight(40);
 
-        statusLabel = new Label("Ready for ship placement!");
+        currentShip = setup.getShips().get(shipIndex);
+        statusLabel = new Label("Place " + currentShip.toString());
         statusLabel.getStyleClass().add("status-label");
 
         Button reset = new Button("Reset");
@@ -107,7 +105,7 @@ public class BoardView extends InteractiveBoardView {
                 startGameButton,
                 rightSpacer
         );
-
+        
         return statusBar;
     }
 
@@ -123,15 +121,11 @@ public class BoardView extends InteractiveBoardView {
         }
 
         startGameButton.setDisable(true);
-        statusLabel.setText("Ready for ship placement!");
+        statusLabel.setText("Place " + currentShip.toString());
     }
 
     private void startGame() {
-        for (int r = 0; r < SIZE; r++) {
-            for (int c = 0; c < SIZE; c++) {
-                cellButton[r][c].setDisable(true);
-            }
-        }
+
         if (onStartGame != null) {
             onStartGame.run();
         }
