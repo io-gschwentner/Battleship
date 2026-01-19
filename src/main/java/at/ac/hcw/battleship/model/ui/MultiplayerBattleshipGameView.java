@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
  *
  * All game logic stays outside this class.
  */
-public class MultiplayerBattleshipGameView {
+public class MultiplayerBattleshipGameView implements BattleshipGameView {
 
     private final EnemyBoardView player1BoardView;
     private final EnemyBoardView player2BoardView;
@@ -82,7 +82,7 @@ public class MultiplayerBattleshipGameView {
     }
 
     /** Enable / disable the board UI (used to enforce turn order). */
-    public void swapBoardDisable(){
+    public void swapDisabledBoard(){
         if (player1Root != null && player2Root != null) {
             player1Root.setDisable(!player1Root.isDisable());
             player2Root.setDisable(!player2Root.isDisable());

@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
  *
  * All game logic stays outside this class.
  */
-public class AiBattleshipGameView {
+public class AiBattleshipGameView implements BattleshipGameView {
 
     private final PlayerBoardView playerBoardView;
     private final EnemyBoardView enemyBoardView;
