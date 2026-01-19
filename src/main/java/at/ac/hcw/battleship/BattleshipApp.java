@@ -1,13 +1,16 @@
 package at.ac.hcw.battleship;
 
 import at.ac.hcw.battleship.logic.Game;
+import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.Ship;
 import at.ac.hcw.battleship.model.enums.GameMode;
 import at.ac.hcw.battleship.model.ui.BattleshipGameView;
 import at.ac.hcw.battleship.model.ui.BoardView;
 import at.ac.hcw.battleship.model.ui.EnemyBoardView;
 import at.ac.hcw.battleship.players.*;
+import at.ac.hcw.battleship.logic.RandomShipPlacement;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,6 +20,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class BattleshipApp extends Application {
 
@@ -166,13 +171,13 @@ public class BattleshipApp extends Application {
      * Can be improved to random placement later.
      */
     private void placeEnemyShips(GameBoard enemyBoard) {
-        enemyBoard.placeShip(1, 1, 4, true);
-        enemyBoard.placeShip(3, 5, 4, false);
-        enemyBoard.placeShip(5, 2, 3, true);
-        enemyBoard.placeShip(7, 7, 3, false);
-        enemyBoard.placeShip(0, 8, 3, false);
-        enemyBoard.placeShip(8, 1, 2, true);
-        enemyBoard.placeShip(2, 9, 2, false);
+
+        GameSetup gameSetup = new GameSetup();
+        List<Integer> shipLengths = gameSetup.getShips()
+                .stream()
+                .map(Ship::getLength)
+                .toList();
+        RandomShipPlacement.placeRandomShips(enemyBoard, shipLengths);
     }
 
     private boolean isFinished(Game game) {
