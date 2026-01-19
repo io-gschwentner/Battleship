@@ -1,10 +1,12 @@
 package at.ac.hcw.battleship.model.enums;
 
-// enums for defining the cell state
+/**
+ * Internal state of a cell on a GameBoard.
+ */
 public enum CellState {
-    EMPTY,          //no ship, not shot
-    SHIP,           //ship, not hit
-    HIT,            //ship & hit
-    MISS,           //shot, no ship
-    SUNK,           //ship, hit & sunk
+    EMPTY,   // no ship, not shot
+    SHIP,    // part of a ship, not hit
+    HIT,     // ship cell that has been hit
+    MISS,    // shot, but no ship
+    SUNK     // ship cell that belongs to a sunk ship
 }

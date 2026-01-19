@@ -1,17 +1,22 @@
 package at.ac.hcw.battleship.model.ui;
 
 import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.enums.CellState;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
+/**
+ * Base class for boards that react to clicks (placement or firing).
+ */
 public abstract class InteractiveBoardView extends SuperBoardView {
-    public InteractiveBoardView(){
+
+    public InteractiveBoardView() {
         super();
     }
 
-    public InteractiveBoardView(GameBoard gameBoard){
+    public InteractiveBoardView(GameBoard gameBoard) {
         super(gameBoard);
     }
 
@@ -27,36 +32,22 @@ public abstract class InteractiveBoardView extends SuperBoardView {
                 Button button = new Button();
                 button.setPrefSize(CELL_SIZE, CELL_SIZE);
                 button.setId(row + "," + col);
-
-                // add CSS style class for all cells
                 button.getStyleClass().add("cell-button");
-
                 button.setOnAction(this::handleCellClick);
 
-                // binding
                 board.cellProperty(row, col).addListener((obs, oldState, newState) -> {
                     button.getStyleClass().removeAll(
                             "cell-empty", "cell-ship", "cell-hit", "cell-miss", "cell-sunk"
                     );
-
-                    switch (newState) {
-                        case EMPTY -> button.getStyleClass().add("cell-empty");
-                        case SHIP  -> button.getStyleClass().add("cell-ship");
-                        case HIT   -> button.getStyleClass().add("cell-hit");
-                        case MISS  -> button.getStyleClass().add("cell-miss");
-                        case SUNK  -> button.getStyleClass().add("cell-sunk");
-                    }
+                    applyCellStyle(button, newState);
                 });
 
                 cellButton[row][col] = button;
-
                 grid.add(button, col, row);
             }
         }
         return grid;
     }
-
-    // ---------- behavior ----------
 
     private void handleCellClick(ActionEvent event) {
         Button button = (Button) event.getSource();
@@ -66,5 +57,15 @@ public abstract class InteractiveBoardView extends SuperBoardView {
         onCellClicked(r, c);
     }
 
-    abstract void onCellClicked(int r, int c);
+    protected void applyCellStyle(Button button, CellState state) {
+        switch (state) {
+            case EMPTY -> button.getStyleClass().add("cell-empty");
+            case SHIP -> button.getStyleClass().add("cell-ship");
+            case HIT -> button.getStyleClass().add("cell-hit");
+            case MISS -> button.getStyleClass().add("cell-miss");
+            case SUNK -> button.getStyleClass().add("cell-sunk");
+        }
+    }
+
+    protected abstract void onCellClicked(int row, int col);
 }

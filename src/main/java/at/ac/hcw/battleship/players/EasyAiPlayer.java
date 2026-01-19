@@ -6,28 +6,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class EasyAiPlayer implements Player{
-    private final Random random = new Random(System.currentTimeMillis());
-    private final List<Coord> notShot;
+/**
+ * Very simple AI: picks random cells that have not been shot yet.
+ */
+public class EasyAiPlayer implements Player {
 
-    public EasyAiPlayer(KnownGameBoard gameState) {
-        notShot = new ArrayList<>();
-        for(int i = 0; i < gameState.getSize(); i++){
-            for(int j = 0; j < gameState.getSize(); j++){
-                notShot.add(new Coord(i, j));
+    private final Random random = new Random();
+    private final List<Coord> remainingShots;
+
+    public EasyAiPlayer(int boardSize) {
+        this.remainingShots = new ArrayList<>();
+        for (int row = 0; row < boardSize; row++) {
+            for (int col = 0; col < boardSize; col++) {
+                remainingShots.add(new Coord(row, col));
             }
         }
     }
 
     @Override
     public void takeTurn(Targetable targetableGameBoard) {
+        if (remainingShots.isEmpty()) {
+            return;
+        }
         Coord shot = chooseShot();
         targetableGameBoard.fireAt(shot.row, shot.col);
+        System.out.println("AI shot at: " + shot.row + "," + shot.col);
     }
 
     private Coord chooseShot() {
-        Coord nextShot = notShot.get(random.nextInt(notShot.size()));
-        notShot.remove(nextShot);
-        return nextShot;
+        int index = random.nextInt(remainingShots.size());
+        Coord next = remainingShots.get(index);
+        remainingShots.remove(index);
+        return next;
     }
 }
