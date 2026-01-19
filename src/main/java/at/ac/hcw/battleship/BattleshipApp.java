@@ -171,13 +171,6 @@ public class BattleshipApp extends Application {
      * Can be improved to random placement later.
      */
     private void placeEnemyShips(GameBoard enemyBoard) {
-//        enemyBoard.placeShip(1, 1, 4, true);
-//        enemyBoard.placeShip(3, 5, 4, false);
-//        enemyBoard.placeShip(5, 2, 3, true);
-//        enemyBoard.placeShip(7, 7, 3, false);
-//        enemyBoard.placeShip(0, 8, 3, false);
-//        enemyBoard.placeShip(8, 1, 2, true);
-//        enemyBoard.placeShip(2, 9, 2, false);
 
         GameSetup gameSetup = new GameSetup();
         List<Integer> shipLengths = gameSetup.getShips()

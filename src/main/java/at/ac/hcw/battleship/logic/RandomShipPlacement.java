@@ -5,6 +5,8 @@ import java.util.*;
 
 public class RandomShipPlacement {
 
+    private static final Random random = new Random();
+
     public static void placeRandomShips(GameBoard board, List<Integer> shipLengths){
         for (int shipLength : shipLengths){
             placeRandomShip(board, shipLength);
@@ -12,7 +14,6 @@ public class RandomShipPlacement {
     }
 
     private static void placeRandomShip(GameBoard board, int shipLength){
-        Random random = new Random();
         int maxAttempts = 1000;
 
 
