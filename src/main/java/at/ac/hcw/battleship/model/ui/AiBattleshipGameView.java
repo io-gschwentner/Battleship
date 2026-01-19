@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
  *
  * All game logic stays outside this class.
  */
-public class BattleshipGameView {
+public class AiBattleshipGameView {
 
     private final PlayerBoardView playerBoardView;
     private final EnemyBoardView enemyBoardView;
@@ -29,7 +29,7 @@ public class BattleshipGameView {
     private final Label missesLabel;
     private final Label enemyShipsLabel;
 
-    public BattleshipGameView(GameBoard playerGameBoard, GameBoard enemyGameBoard) {
+    public AiBattleshipGameView(GameBoard playerGameBoard, GameBoard enemyGameBoard) {
         this.playerBoardView = new PlayerBoardView(playerGameBoard);
         this.enemyBoardView = new EnemyBoardView(enemyGameBoard);
 

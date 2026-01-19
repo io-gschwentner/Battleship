@@ -4,9 +4,7 @@ import at.ac.hcw.battleship.logic.Game;
 import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.enums.GameMode;
-import at.ac.hcw.battleship.model.ui.BattleshipGameView;
-import at.ac.hcw.battleship.model.ui.BoardView;
-import at.ac.hcw.battleship.model.ui.EnemyBoardView;
+import at.ac.hcw.battleship.model.ui.*;
 import at.ac.hcw.battleship.players.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -38,9 +36,39 @@ public class BattleshipApp extends Application {
         title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
 
         Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> showPlacementScene(stage));
+        startButton.setOnAction(e -> showGamemodeScene(stage));
 
         root.getChildren().addAll(title, startButton);
+
+        Scene scene = new Scene(root, 600, 400);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+
+        stage.setTitle("Battleship");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    // ---------- Gamemode picker ----------
+
+    private void showGamemodeScene(Stage stage) {
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+
+        Label title = new Label("Battleship");
+        title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
+
+        Button vsEasyAiButton = new Button("Easy");
+        vsEasyAiButton.setOnAction(e -> {gameMode = GameMode.EASY_AI; showPlacementScene(stage);});
+
+        Button vsMediumAiButton = new Button("Medium");
+        vsMediumAiButton.setOnAction(e -> {gameMode = GameMode.MEDIUM_AI; showPlacementScene(stage);});
+
+        Button vsHumanButton = new Button("vs Human");
+        vsHumanButton.setOnAction(e -> {gameMode = GameMode.TWO_PLAYERS; showPlacementSceneMultiplayer(stage);});
+
+        root.getChildren().addAll(title, vsEasyAiButton, vsMediumAiButton, vsHumanButton);
 
         Scene scene = new Scene(root, 600, 400);
         scene.getStylesheets().add(
@@ -71,7 +99,115 @@ public class BattleshipApp extends Application {
                 startGameScene(stage, setupView.getBoard()));
     }
 
+    // ---------- Placement scene multiplayer ----------
+
+    private void showPlacementSceneMultiplayer(Stage stage) {
+        BoardView setupViewPlayer1 = new BoardView();
+        BorderPane root = setupViewPlayer1.createRoot();
+
+        Scene scene = new Scene(root, 1000, 550);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+
+        stage.setTitle("Battleship – Player 1: Place your ships");
+        stage.setScene(scene);
+        stage.show();
+
+        setupViewPlayer1.setOnStartGame(() ->
+                showPlacementSceneMultiplayer(stage, setupViewPlayer1.getBoard()));
+    }
+    private void showPlacementSceneMultiplayer(Stage stage, GameBoard gameBoardPlayer1) {
+        BoardView setupViewPlayer2 = new BoardView();
+        BorderPane root = setupViewPlayer2.createRoot();
+
+        Scene scene = new Scene(root, 1000, 550);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+
+        stage.setTitle("Battleship – Player 2: Place your ships");
+        stage.setScene(scene);
+        stage.show();
+
+        setupViewPlayer2.setOnStartGame(() ->
+                startGameScene(stage, gameBoardPlayer1, setupViewPlayer2.getBoard()));
+    }
+
     // ---------- Game scene ----------
+    private void startGameScene(Stage stage, GameBoard player1Board, GameBoard player2Board) {
+        Player humanPlayer = new HumanPlayer();
+        Player opponent = new HumanPlayer();
+
+        Game game = new Game(humanPlayer, opponent, player1Board, player2Board);
+
+        MultiplayerBattleshipGameView gameView = new MultiplayerBattleshipGameView(player1Board, player2Board);
+        HBox root = gameView.createRoot();
+
+        Scene scene = new Scene(root, 1200, 550);
+        scene.getStylesheets().add(
+                getClass().getResource("/styles.css").toExternalForm()
+        );
+
+        stage.setTitle("Battleship – Game");
+        stage.setScene(scene);
+        stage.show();
+
+        final int[] hits = {0};
+        final int[] misses = {0};
+
+        gameView.updateStats(hits[0], misses[0], player2Board.getRemainingShipCells());
+        gameView.setStatus("Player 1 turn");
+
+        EnemyBoardView player2BoardView = gameView.getPlayer2BoardView();
+        gameView.setPlayer2BoardDisabled(false);
+
+        player2BoardView.setOnHumanShot(coord -> {
+            System.out.println("Enemy cell clicked: " + coord.row + "," + coord.col);
+            handleShot(coord, game, player2Board, hits, misses, gameView);
+        });
+
+        EnemyBoardView player1BoardView = gameView.getPlayer1BoardView();
+        gameView.setPlayer1BoardDisabled(true);
+
+        player1BoardView.setOnHumanShot(coord -> {
+            System.out.println("Enemy cell clicked: " + coord.row + "," + coord.col);
+            handleShot(coord, game, player1Board, hits, misses, gameView);
+        });
+    }
+
+    private void handleShot(Coord coord,
+                                 Game game,
+                                 GameBoard enemyBoard,
+                                 int[] hits,
+                                 int[] misses,
+                                 MultiplayerBattleshipGameView view) {
+        if (isFinished(game)) {
+            view.setStatus(gameResultText(game));
+            return;
+        }
+
+        // Disable enemy board so the player cannot click twice
+        view.swapBoardDisable();
+
+        var result = enemyBoard.fireAt(coord.row, coord.col);
+
+        switch (result) {
+            case HIT, SUNK -> hits[0]++;
+            case MISS -> misses[0]++;
+            default -> { }
+        }
+
+        view.updateStats(hits[0], misses[0], enemyBoard.getRemainingShipCells());
+
+        if (isFinished(game)) {
+            view.setStatus(gameResultText(game));
+            return;
+        }
+
+        // Next Player turn
+        game.playTurn();
+    }
 
     private void startGameScene(Stage stage, GameBoard player1Board) {
         GameBoard player2Board = new GameBoard(BoardView.SIZE);
@@ -82,10 +218,10 @@ public class BattleshipApp extends Application {
 
         Game game = new Game(humanPlayer, opponent, player1Board, player2Board);
 
-        BattleshipGameView gameView = new BattleshipGameView(player1Board, player2Board);
+        AiBattleshipGameView gameView = new AiBattleshipGameView(player1Board, player2Board);
         HBox root = gameView.createRoot();
 
-        Scene scene = new Scene(root, 1000, 550);
+        Scene scene = new Scene(root, 1200, 550);
         scene.getStylesheets().add(
                 getClass().getResource("/styles.css").toExternalForm()
         );
@@ -114,8 +250,7 @@ public class BattleshipApp extends Application {
                                  GameBoard enemyBoard,
                                  int[] hits,
                                  int[] misses,
-                                 BattleshipGameView view) {
-
+                                 AiBattleshipGameView view) {
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
             return;
@@ -148,6 +283,8 @@ public class BattleshipApp extends Application {
             view.setStatus("Your turn");
             // Re-enable enemy board for the next human shot
             view.setEnemyBoardDisabled(false);
+            // logic pass turn to human
+            game.playTurn();
         }
     }
 
