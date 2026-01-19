@@ -11,7 +11,7 @@ javafx {
 }
 
 application{
-    mainClass = "at.ac.hcw.battleship.Program"
+    mainClass = "at.ac.hcw.battleship.BattleshipApp"
 }
 
 group = "at.ac.hcw"

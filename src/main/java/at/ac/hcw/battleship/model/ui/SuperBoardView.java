@@ -1,28 +1,25 @@
 package at.ac.hcw.battleship.model.ui;
 
-import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.model.GameBoard;
-import at.ac.hcw.battleship.model.Ship;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 
+/**
+ * Base class for all board views (interactive and static).
+ * Builds labels, grid and bottom panel.
+ */
 public abstract class SuperBoardView {
 
     public static final int SIZE = 10;
     public static final int CELL_SIZE = 40;
 
     protected final GameBoard board;
-
     protected final Button[][] cellButton;
 
     protected int shipIndex = 0;
-    protected Ship currentShip;
     protected Label statusLabel;
     protected Button startGameButton;
 
@@ -31,7 +28,7 @@ public abstract class SuperBoardView {
         this.cellButton = new Button[SIZE][SIZE];
     }
 
-    public SuperBoardView(GameBoard gameBoard){
+    public SuperBoardView(GameBoard gameBoard) {
         this.board = gameBoard;
         this.cellButton = new Button[SIZE][SIZE];
     }
@@ -39,8 +36,6 @@ public abstract class SuperBoardView {
     public GameBoard getBoard() {
         return board;
     }
-
-    // ---------- layout building ----------
 
     public BorderPane createRoot() {
         BorderPane root = new BorderPane();
@@ -110,7 +105,7 @@ public abstract class SuperBoardView {
         return labels;
     }
 
-    abstract HBox createBottomPanel();
+    protected abstract HBox createBottomPanel();
 
-    abstract GridPane createGrid();
+    protected abstract GridPane createGrid();
 }

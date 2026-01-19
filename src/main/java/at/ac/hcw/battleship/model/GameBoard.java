@@ -8,16 +8,24 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameBoard implements Targetable{
+/**
+ * Represents a square Battleship board with ships and shots.
+ * Uses JavaFX properties so the UI can bind to cell changes.
+ */
+public class GameBoard implements Targetable {
+
     private final int size;
     private final ObjectProperty<CellState>[][] grid;
     private final List<Ship> ships;
 
     @SuppressWarnings("unchecked")
     public GameBoard(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Board size must be positive");
+        }
         this.size = size;
         this.grid = new ObjectProperty[size][size];
-        ships = new ArrayList<>();
+        this.ships = new ArrayList<>();
         clearBoard();
     }
 
@@ -25,18 +33,27 @@ public class GameBoard implements Targetable{
         return size;
     }
 
-    // Property access (important for binding)
+    /**
+     * Property access for JavaFX binding.
+     */
     public ObjectProperty<CellState> cellProperty(int row, int col) {
+        checkBounds(row, col);
         return grid[row][col];
     }
 
-    //get the cell state
+    /**
+     * Returns the current cell state at (row, col).
+     */
     public CellState getCell(int row, int col) {
+        checkBounds(row, col);
         return grid[row][col].get();
     }
 
-    //set every cell to EMPTY
+    /**
+     * Clears the board to EMPTY and removes all ships.
+     */
     public void clearBoard() {
+        ships.clear();
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
                 grid[r][c] = new SimpleObjectProperty<>(CellState.EMPTY);
@@ -44,21 +61,35 @@ public class GameBoard implements Targetable{
         }
     }
 
-    //check if rows and cols are in bounds (0 and size-1)
     private boolean inBounds(int row, int col) {
         return row >= 0 && row < size && col >= 0 && col < size;
     }
 
-    //placing ships (only multi-tile ships)
-    public boolean placeShip(int row, int col, int length, boolean horizontal) {
-        int endRow = horizontal ? row : row + length - 1;    //find end row of the ship
-        int endCol = horizontal ? col + length - 1 : col;   //find end col of the ship
+    private void checkBounds(int row, int col) {
+        if (!inBounds(row, col)) {
+            throw new IndexOutOfBoundsException(
+                    "Cell out of bounds: (" + row + "," + col + ")");
+        }
+    }
 
-        //cell validation (BOUNDS)
+    /**
+     * Places a new ship of given length starting at (row, col).
+     * Returns true if placement is valid and successful.
+     */
+    public boolean placeShip(int row, int col, int length, boolean horizontal) {
+        if (length <= 0) {
+            return false;
+        }
+
+        int endRow = horizontal ? row : row + length - 1;
+        int endCol = horizontal ? col + length - 1 : col;
+
+        // bounds check
         if (!inBounds(row, col) || !inBounds(endRow, endCol)) {
             return false;
         }
-        //validation (EMPTY?)
+
+        // no overlap
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
                 if (grid[r][c].get() != CellState.EMPTY) {
@@ -67,17 +98,22 @@ public class GameBoard implements Targetable{
             }
         }
 
-        //place ship
-        Ship newShip = new Ship("Ship", length);
+        // place ship and record its coordinates
+        Ship ship = new Ship("Ship", length);
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
                 grid[r][c].set(CellState.SHIP);
-                newShip.addCoordinate(new Coord(r, c));
+                ship.addCoordinate(new Coord(r, c));
             }
         }
-        ships.add(newShip);
+        ships.add(ship);
         return true;
     }
+
+    /**
+     * Counts how many ship cells are still not hit/sunk.
+     * This is used by WinLossService for win/loss evaluation.
+     */
     public int getRemainingShipCells() {
         int count = 0;
         for (int r = 0; r < size; r++) {
@@ -90,35 +126,56 @@ public class GameBoard implements Targetable{
         return count;
     }
 
-    public CellState fireAt(int row, int col) {
-        if (!inBounds(row, col)) {
-            throw new IllegalArgumentException("Shot out of bounds");
-        }
-
-        if (grid[row][col].get() == CellState.SHIP) {
-            if(ships.stream().findFirst().isPresent()) {
-                grid[row][col].set(CellState.HIT);
-                Ship ship = ships.stream().findFirst().get();
-                ship.addHit();
-                if(ship.isSunk()){
-                    for(Coord coordinate : ship.getCoordinates()){
-                        grid[coordinate.row][coordinate.col].set(CellState.SUNK);
-                    }
-                    return CellState.SUNK;
+    /**
+     * Finds the ship occupying the given cell, or null if none.
+     */
+    private Ship findShipAt(int row, int col) {
+        for (Ship ship : ships) {
+            for (Coord coordinate : ship.getCoordinates()) {
+                if (coordinate.row == row && coordinate.col == col) {
+                    return ship;
                 }
-                return CellState.HIT;
-            }
-            else {
-                throw new RuntimeException();
             }
         }
+        return null;
+    }
 
-        if (grid[row][col].get() == CellState.EMPTY) {
+    /**
+     * Fires at (row, col) and updates the board:
+     * - SHIP  -> HIT or SUNK (and marks all cells of that ship as SUNK)
+     * - EMPTY -> MISS
+     * - already HIT/MISS/SUNK -> unchanged
+     */
+    @Override
+    public CellState fireAt(int row, int col) {
+        checkBounds(row, col);
+
+        CellState current = grid[row][col].get();
+
+        if (current == CellState.SHIP) {
+            Ship ship = findShipAt(row, col);
+            if (ship == null) {
+                throw new IllegalStateException("No ship found for hit cell at (" + row + "," + col + ")");
+            }
+
+            grid[row][col].set(CellState.HIT);
+            ship.addHit();
+
+            if (ship.isSunk()) {
+                for (Coord coordinate : ship.getCoordinates()) {
+                    grid[coordinate.row][coordinate.col].set(CellState.SUNK);
+                }
+                return CellState.SUNK;
+            }
+            return CellState.HIT;
+        }
+
+        if (current == CellState.EMPTY) {
             grid[row][col].set(CellState.MISS);
             return CellState.MISS;
         }
 
-        // already shot here
-        return grid[row][col].get();
+        // already shot here (HIT, MISS or SUNK)
+        return current;
     }
 }

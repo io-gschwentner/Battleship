@@ -3,56 +3,58 @@
     -fx-background-color: linear-gradient(to bottom, #020617, #0f172a);
 }
 
-/* grid cells – sea */
+/* Base grid cell */
 .cell-button {
-    -fx-background-color: #0f172a;
+    -fx-background-color: #0f172a;      /* dark sea */
     -fx-border-color: #1e293b;
     -fx-border-width: 1;
     -fx-background-radius: 0;
-    -fx-text-fill: transparent; /* no text */
+    -fx-text-fill: transparent;
     -fx-padding: 0;
 }
 
-/* hover highlight when placing ships */
+/* Hover for interactive cells (enemy board / placement) */
 .cell-button:hover {
     -fx-background-color: #1d3557;
 }
 
-.cell-button.cell-ship.no-hover:hover{
-    -fx-background-color: #0b5a8f;
-}
-
-.cell-button.cell-hit.no-hover:hover{
-    -fx-background-color: #b91c1c;
-}
-
-.cell-button.cell-sunk.no-hover:hover{
-    -fx-background-color: #4d0101;
-}
-
-.cell-button.no-hover:hover{
+/* Disable hover for static player board cells */
+.cell-button.no-hover:hover {
     -fx-background-color: #0f172a;
 }
 
-/* placed ship tiles */
+/* Ship (only visible on own board) */
 .cell-ship {
+    -fx-background-color: #0b5a8f;      /* blue ship */
+}
+
+/* Hit */
+.cell-hit {
+    -fx-background-color: #b91c1c;      /* bright red */
+}
+
+/* Miss */
+.cell-miss {
+    -fx-background-color: #e5e7eb;      /* light gray/white */
+}
+
+/* Sunk */
+.cell-sunk {
+    -fx-background-color: #4d0101;      /* dark red */
+}
+
+/* Optional: keep hover color for static board states */
+.cell-button.cell-ship.no-hover:hover {
     -fx-background-color: #0b5a8f;
 }
-
-/* later: hit and miss styles if you want */
-.cell-hit {
+.cell-button.cell-hit.no-hover:hover {
     -fx-background-color: #b91c1c;
 }
-
-.cell-miss {
-    -fx-background-color: #e5e7eb;
-}
-
-.cell-sunk {
+.cell-button.cell-sunk.no-hover:hover {
     -fx-background-color: #4d0101;
 }
 
-/* status bar */
+/* Status bar */
 .status-bar {
     -fx-background-color: #020617;
     -fx-border-color: #1e293b;
@@ -62,4 +64,33 @@
 .status-label {
     -fx-text-fill: #e5e7eb;
     -fx-font-size: 14px;
+}
+
+/* Stats side panel */
+.stats-panel {
+    -fx-background-color: #020617;
+    -fx-border-color: #1e293b;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-spacing: 8;
+}
+
+.stats-title {
+    -fx-text-fill: #e5e7eb;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+/* Labels inside stats panel (hits, misses, ships, status) */
+.stats-panel > .label {
+    -fx-text-fill: #e5e7eb;
+    -fx-font-size: 13px;
+}
+
+/* Optional: make status line stand out a bit more if you give it a style class in code */
+.status-text {
+    -fx-text-fill: #facc15;  /* yellow-ish */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
