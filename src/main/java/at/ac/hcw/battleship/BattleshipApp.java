@@ -1,19 +1,25 @@
 package at.ac.hcw.battleship;
 
 import at.ac.hcw.battleship.logic.Game;
+import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
+import at.ac.hcw.battleship.model.Ship;
 import at.ac.hcw.battleship.model.enums.GameMode;
 import at.ac.hcw.battleship.model.ui.*;
 import at.ac.hcw.battleship.players.*;
+import at.ac.hcw.battleship.logic.RandomShipPlacement;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class BattleshipApp extends Application {
 
@@ -213,6 +219,19 @@ public class BattleshipApp extends Application {
         };
     }
 
+    /**
+     * Generated placement for AI ships (same fleet size as player).
+     */
+    private void placeEnemyShips(GameBoard enemyBoard) {
+
+        GameSetup gameSetup = new GameSetup();
+        List<Integer> shipLengths = gameSetup.getShips()
+                .stream()
+                .map(Ship::getLength)
+                .toList();
+        RandomShipPlacement.placeRandomShips(enemyBoard, shipLengths);
+    }
+
     private boolean isFinished(Game game) {
         return game.getResult() != WinLossService.GameResult.ONGOING;
     }
@@ -224,16 +243,6 @@ public class BattleshipApp extends Application {
             case DRAW         -> "Game over – Draw";
             default           -> "Game over";
         };
-    }
-
-    private void placeEnemyShips(GameBoard board) {
-        board.placeShip(1, 1, 4, true);
-        board.placeShip(3, 5, 4, false);
-        board.placeShip(5, 2, 3, true);
-        board.placeShip(7, 7, 3, false);
-        board.placeShip(0, 8, 3, false);
-        board.placeShip(8, 1, 2, true);
-        board.placeShip(2, 9, 2, false);
     }
 
     private void setScene(Stage stage,
