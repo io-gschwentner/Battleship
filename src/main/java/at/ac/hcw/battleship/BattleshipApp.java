@@ -5,6 +5,7 @@ import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.Ship;
+import at.ac.hcw.battleship.model.Stats;
 import at.ac.hcw.battleship.model.enums.GameMode;
 import at.ac.hcw.battleship.model.ui.*;
 import at.ac.hcw.battleship.players.*;
@@ -15,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -113,6 +113,8 @@ public class BattleshipApp extends Application {
 
         setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
 
+        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
+
         setupAiHandlers(view, game, enemyBoard);
     }
 
@@ -132,6 +134,8 @@ public class BattleshipApp extends Application {
 
         setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
 
+        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
+
         setupMultiplayerHandlers(view, game, p1Board, p2Board);
     }
 
@@ -141,14 +145,13 @@ public class BattleshipApp extends Application {
                                  Game game,
                                  GameBoard enemyBoard) {
 
-        int hits = 0;
-        int misses = 0;
+        Stats stats = new Stats(); // hits/misses for the human vs AI
 
         view.updateStats(0, 0, enemyBoard.getRemainingShipCells());
         view.setStatus("Your turn");
 
         view.getEnemyBoardView().setOnHumanShot(coord -> {
-            if (handleShot(coord, game, enemyBoard, hits, misses, view)) {
+            if (handleShot(coord, game, enemyBoard, stats, view)) {
                 view.setStatus("Enemy taking turn");
                 game.playTurn(); // AI turn
                 view.setEnemyBoardDisabled(false);
@@ -162,27 +165,28 @@ public class BattleshipApp extends Application {
                                           GameBoard p1Board,
                                           GameBoard p2Board) {
 
-        int hits = 0;
-        int misses = 0;
+        Stats p1Stats = new Stats(); // stats for player 1 shooting at p2Board
+        Stats p2Stats = new Stats(); // stats for player 2 shooting at p1Board
 
         view.setPlayer1BoardDisabled(true);
 
-        view.getPlayer2BoardView().setOnHumanShot(coord ->{
+        // Player 1 shoots at Player 2's board
+        view.getPlayer2BoardView().setOnHumanShot(coord -> {
             view.swapDisabledBoard();
-            handleShot(coord, game, p2Board, hits, misses, view);
+            handleShot(coord, game, p2Board, p1Stats, view);
         });
 
+        // Player 2 shoots at Player 1's board
         view.getPlayer1BoardView().setOnHumanShot(coord -> {
             view.swapDisabledBoard();
-            handleShot(coord, game, p1Board, hits, misses, view);
+            handleShot(coord, game, p1Board, p2Stats, view);
         });
     }
 
     private boolean handleShot(Coord coord,
                                Game game,
                                GameBoard enemyBoard,
-                               int hits,
-                               int misses,
+                               Stats stats,
                                BattleshipGameView view) {
 
         if (isFinished(game)) {
@@ -193,11 +197,11 @@ public class BattleshipApp extends Application {
         var result = enemyBoard.fireAt(coord.row, coord.col);
 
         switch (result) {
-            case HIT, SUNK -> hits++;
-            case MISS -> misses++;
+            case HIT, SUNK -> stats.hits++;
+            case MISS      -> stats.misses++;
         }
 
-        view.updateStats(hits, misses,
+        view.updateStats(stats.hits, stats.misses,
                 enemyBoard.getRemainingShipCells());
 
         if (isFinished(game)) {

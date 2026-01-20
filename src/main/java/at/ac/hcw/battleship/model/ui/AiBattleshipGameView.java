@@ -3,6 +3,7 @@ package at.ac.hcw.battleship.model.ui;
 import at.ac.hcw.battleship.model.GameBoard;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -28,6 +29,8 @@ public class AiBattleshipGameView implements BattleshipGameView {
     private final Label hitsLabel;
     private final Label missesLabel;
     private final Label enemyShipsLabel;
+
+    private final Button backButton = new Button("Back to main menu");
 
     public AiBattleshipGameView(GameBoard playerGameBoard, GameBoard enemyGameBoard) {
         this.playerBoardView = new PlayerBoardView(playerGameBoard);
@@ -66,7 +69,7 @@ public class AiBattleshipGameView implements BattleshipGameView {
         Label title = new Label("Game Info");
         title.getStyleClass().add("stats-title");
 
-        box.getChildren().addAll(title, statusLabel, hitsLabel, missesLabel, enemyShipsLabel);
+        box.getChildren().addAll(title, statusLabel, hitsLabel, missesLabel, enemyShipsLabel, backButton);
         return box;
     }
 
@@ -93,5 +96,9 @@ public class AiBattleshipGameView implements BattleshipGameView {
 
     public EnemyBoardView getEnemyBoardView() {
         return enemyBoardView;
+    }
+
+    public Button getBackButton() {
+        return backButton;
     }
 }
