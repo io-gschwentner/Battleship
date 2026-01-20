@@ -155,6 +155,7 @@ public class BattleshipApp extends Application {
                 view.setStatus("Enemy taking turn");
                 if (isFinished(game)) {
                     view.setStatus(gameResultText(game));
+                    view.disableInteractions();
                     return;
                 }
                 game.playTurn(); //pass turn to human
@@ -195,6 +196,7 @@ public class BattleshipApp extends Application {
 
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
+            view.disableInteractions();
             return false;
         }
 
@@ -210,6 +212,7 @@ public class BattleshipApp extends Application {
 
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
+            view.disableInteractions();
             return false;
         }
 
