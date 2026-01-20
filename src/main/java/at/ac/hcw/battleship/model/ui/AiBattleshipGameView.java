@@ -41,7 +41,7 @@ public class AiBattleshipGameView implements BattleshipGameView {
 
         this.hitsLabel = new Label("Hits: 0");
         this.missesLabel = new Label("Misses: 0");
-        this.enemyShipsLabel = new Label("Enemy ships remaining: 0");
+        this.enemyShipsLabel = new Label("Enemy ships left: 0");
     }
 
     /**
@@ -76,7 +76,7 @@ public class AiBattleshipGameView implements BattleshipGameView {
     public void updateStats(int hits, int misses, int enemyShipsRemaining) {
         hitsLabel.setText("Hits: " + hits);
         missesLabel.setText("Misses: " + misses);
-        enemyShipsLabel.setText("Enemy ships remaining: " + enemyShipsRemaining);
+        enemyShipsLabel.setText("Enemy ships left: " + enemyShipsRemaining);
     }
 
     public void setStatus(String message) {

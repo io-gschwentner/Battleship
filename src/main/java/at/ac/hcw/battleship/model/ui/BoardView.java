@@ -113,7 +113,7 @@ public class BoardView extends InteractiveBoardView {
         board.clearBoard();
         setup.reset();
         shipIndex = 0;
-        currentShip = null;
+        currentShip = setup.getShips().get(shipIndex);
 
         for (Ship ship : setup.getShips()) {
             ship.setPlaced(false);
