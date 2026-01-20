@@ -62,6 +62,7 @@ public class AiBattleshipGameView implements BattleshipGameView {
 
     private VBox createStatsPane() {
         VBox box = new VBox(8);
+        box.setMinWidth(200);
         box.setAlignment(Pos.TOP_LEFT);
         box.setPadding(new Insets(10));
         box.getStyleClass().add("stats-panel");

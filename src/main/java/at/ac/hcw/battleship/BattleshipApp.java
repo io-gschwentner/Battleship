@@ -153,7 +153,11 @@ public class BattleshipApp extends Application {
         view.getEnemyBoardView().setOnHumanShot(coord -> {
             if (handleShot(coord, game, enemyBoard, stats, view)) {
                 view.setStatus("Enemy taking turn");
-                game.playTurn(); // AI turn
+                if (isFinished(game)) {
+                    view.setStatus(gameResultText(game));
+                    return;
+                }
+                game.playTurn(); //pass turn to human
                 view.setEnemyBoardDisabled(false);
                 view.setStatus("Your turn");
             }
@@ -209,7 +213,7 @@ public class BattleshipApp extends Application {
             return false;
         }
 
-        game.playTurn();
+        game.playTurn(); //pass turn (to AI/ other Player)
         return true;
     }
 
