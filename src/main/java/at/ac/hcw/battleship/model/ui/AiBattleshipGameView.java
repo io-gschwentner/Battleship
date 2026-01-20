@@ -22,8 +22,9 @@ public class AiBattleshipGameView implements BattleshipGameView {
     private final PlayerBoardView playerBoardView;
     private final EnemyBoardView enemyBoardView;
 
-    // we keep the actual node so we can disable it
+    // we keep the actual nodes so we can disable them
     private BorderPane enemyRoot;
+    private BorderPane playerRoot;
 
     private final Label statusLabel;
     private final Label hitsLabel;
@@ -51,11 +52,11 @@ public class AiBattleshipGameView implements BattleshipGameView {
     public HBox createRoot() {
         HBox root = new HBox(20);
 
-        BorderPane playerPane = playerBoardView.createRoot();
+        this.playerRoot = playerBoardView.createRoot();
         this.enemyRoot = enemyBoardView.createRoot();
         VBox statsPane = createStatsPane();
 
-        root.getChildren().addAll(playerPane, enemyRoot, statsPane);
+        root.getChildren().addAll(playerRoot, enemyRoot, statsPane);
         root.setPadding(new Insets(10));
         return root;
     }
@@ -80,8 +81,18 @@ public class AiBattleshipGameView implements BattleshipGameView {
         enemyShipsLabel.setText("Enemy ships left: " + enemyShipsRemaining);
     }
 
+    @Override
+    public void disableInteractions() {
+        setPlayerBoardDisabled();
+        setEnemyBoardDisabled(true);
+    }
+
     public void setStatus(String message) {
         statusLabel.setText(message);
+    }
+
+    public void setPlayerBoardDisabled() {
+        playerRoot.setDisable(true);
     }
 
     /** Enable / disable the enemy board UI (used to enforce turn order). */

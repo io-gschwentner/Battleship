@@ -81,6 +81,12 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
         enemyShipsLabel.setText("Enemy ships left: " + enemyShipsRemaining);
     }
 
+    @Override
+    public void disableInteractions() {
+        setPlayer1BoardDisabled(true);
+        setPlayer2BoardDisabled(true);
+    }
+
     public void setStatus(String message) {
         statusLabel.setText(message);
     }
