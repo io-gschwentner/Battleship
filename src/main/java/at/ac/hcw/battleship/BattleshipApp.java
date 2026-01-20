@@ -12,6 +12,7 @@ import at.ac.hcw.battleship.players.*;
 import at.ac.hcw.battleship.logic.RandomShipPlacement;
 import javafx.application.Application;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -20,11 +21,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BattleshipApp extends Application {
 
-    private static final int WIDTH = 1200;
+    private static final int MENU_WIDTH = 600;
+    private static final int MENU_HEIGHT = 400;
+    private static final int PLACEMENT_WIDTH = 1000;
+    private static final int WIDTH = 1300;
     private static final int HEIGHT = 550;
+    private static final int SPACING = 20;
+    private static final int FONT_SIZE = 32;
+    private static final String TITLE = "Battleship";
 
     private GameMode gameMode = GameMode.EASY_AI;
 
@@ -36,23 +44,23 @@ public class BattleshipApp extends Application {
     // ---------- Splash ----------
 
     private void showSplash(Stage stage) {
-        VBox root = createCenteredVBox(20,
-                styledLabel("Battleship", 32),
-                createButton("Start Game", () -> showGamemodeScene(stage))
+        VBox root = createCenteredVBox(
+                styledLabel(),
+                createButton("Start Game", () -> showGameModeScene(stage))
         );
-        setScene(stage, root, 600, 400, "Battleship");
+        setScene(stage, root, MENU_WIDTH, MENU_HEIGHT, TITLE);
     }
 
     // ---------- Menu ----------
 
-    private void showGamemodeScene(Stage stage) {
-        VBox root = createCenteredVBox(20,
-                styledLabel("Battleship", 32),
+    private void showGameModeScene(Stage stage) {
+        VBox root = createCenteredVBox(
+                styledLabel(),
                 createButton("Easy", () -> startPlacement(stage, GameMode.EASY_AI)),
                 createButton("Medium", () -> startPlacement(stage, GameMode.MEDIUM_AI)),
                 createButton("vs Human", () -> startPlacement(stage, GameMode.TWO_PLAYERS))
         );
-        setScene(stage, root, 600, 400, "Battleship");
+        setScene(stage, root, MENU_WIDTH, MENU_HEIGHT, TITLE);
     }
 
     private void startPlacement(Stage stage, GameMode mode) {
@@ -71,7 +79,7 @@ public class BattleshipApp extends Application {
         BoardView setupView = new BoardView();
         BorderPane root = setupView.createRoot();
 
-        setScene(stage, root, 1000, HEIGHT, "Place your ships");
+        setScene(stage, root, PLACEMENT_WIDTH, HEIGHT, "Place your ships");
 
         setupView.setOnStartGame(() ->
                 startAiGame(stage, setupView.getBoard()));
@@ -79,7 +87,7 @@ public class BattleshipApp extends Application {
 
     private void continueMultiplayerPlacement(Stage stage) {
         BoardView p1View = new BoardView();
-        setScene(stage, p1View.createRoot(), 1000, HEIGHT,
+        setScene(stage, p1View.createRoot(), PLACEMENT_WIDTH, HEIGHT,
                 "Player 1 – Place your ships");
 
         p1View.setOnStartGame(() ->
@@ -88,7 +96,7 @@ public class BattleshipApp extends Application {
 
     private void continueMultiplayerPlacement(Stage stage, GameBoard p1Board) {
         BoardView p2View = new BoardView();
-        setScene(stage, p2View.createRoot(), 1000, HEIGHT,
+        setScene(stage, p2View.createRoot(), PLACEMENT_WIDTH, HEIGHT,
                 "Player 2 – Place your ships");
 
         p2View.setOnStartGame(() ->
@@ -111,9 +119,9 @@ public class BattleshipApp extends Application {
         AiBattleshipGameView view =
                 new AiBattleshipGameView(playerBoard, enemyBoard);
 
-        setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
+        setScene(stage, view.createRoot(), WIDTH, HEIGHT, TITLE);
 
-        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
+        view.getBackButton().setOnAction(e -> showGameModeScene(stage));
 
         setupAiHandlers(view, game, enemyBoard);
     }
@@ -132,9 +140,9 @@ public class BattleshipApp extends Application {
         MultiplayerBattleshipGameView view =
                 new MultiplayerBattleshipGameView(p1Board, p2Board);
 
-        setScene(stage, view.createRoot(), WIDTH, HEIGHT, "Battleship");
+        setScene(stage, view.createRoot(), WIDTH, HEIGHT, TITLE);
 
-        view.getBackButton().setOnAction(e -> showGamemodeScene(stage));
+        view.getBackButton().setOnAction(e -> showGameModeScene(stage));
 
         setupMultiplayerHandlers(view, game, p1Board, p2Board);
     }
@@ -147,7 +155,7 @@ public class BattleshipApp extends Application {
 
         Stats stats = new Stats(); // hits/misses for the human vs AI
 
-        view.updateStats(0, 0, enemyBoard.getRemainingShipCells());
+        view.updateStats(stats.hits, stats.misses, enemyBoard.getRemainingShipCells());
         view.setStatus("Your turn");
 
         view.getEnemyBoardView().setOnHumanShot(coord -> {
@@ -256,15 +264,15 @@ public class BattleshipApp extends Application {
                           String title) {
         Scene scene = new Scene(root, w, h);
         scene.getStylesheets().add(
-                getClass().getResource("/styles.css").toExternalForm()
+                Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm()
         );
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
     }
 
-    private VBox createCenteredVBox(int spacing, javafx.scene.Node... nodes) {
-        VBox box = new VBox(spacing, nodes);
+    private VBox createCenteredVBox(Node... nodes) {
+        VBox box = new VBox(BattleshipApp.SPACING, nodes);
         box.setAlignment(Pos.CENTER);
         return box;
     }
@@ -275,9 +283,9 @@ public class BattleshipApp extends Application {
         return btn;
     }
 
-    private Label styledLabel(String text, int size) {
-        Label label = new Label(text);
-        label.setStyle("-fx-text-fill: white; -fx-font-size: " + size +
+    private Label styledLabel() {
+        Label label = new Label(TITLE);
+        label.setStyle("-fx-text-fill: white; -fx-font-size: " + FONT_SIZE +
                 "px; -fx-font-weight: bold;");
         return label;
     }
