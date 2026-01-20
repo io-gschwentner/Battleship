@@ -5,6 +5,7 @@ import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.logic.WinLossService;
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.Ship;
+import at.ac.hcw.battleship.model.Stats;
 import at.ac.hcw.battleship.model.enums.GameMode;
 import at.ac.hcw.battleship.model.ui.*;
 import at.ac.hcw.battleship.players.*;
@@ -26,12 +27,6 @@ public class BattleshipApp extends Application {
     private static final int HEIGHT = 550;
 
     private GameMode gameMode = GameMode.EASY_AI;
-
-    // simple stats holder so we can mutate hits/misses across calls
-    public static class Stats {
-        int hits;
-        int misses;
-    }
 
     @Override
     public void start(Stage stage) {
