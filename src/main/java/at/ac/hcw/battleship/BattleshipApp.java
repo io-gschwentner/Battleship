@@ -191,7 +191,7 @@ public class BattleshipApp extends Application {
         });
     }
 
-    private boolean handleShot(Coord coord,
+    private boolean handleShot(Coordinates coordinates,
                                Game game,
                                GameBoard enemyBoard,
                                Stats stats,
@@ -202,7 +202,7 @@ public class BattleshipApp extends Application {
             return false;
         }
 
-        var result = enemyBoard.fireAt(coord.row, coord.col);
+        var result = enemyBoard.fireAt(coordinates.row(), coordinates.col());
 
         switch (result) {
             case HIT, SUNK -> stats.hits++;

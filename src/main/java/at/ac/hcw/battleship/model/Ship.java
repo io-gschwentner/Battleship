@@ -1,6 +1,6 @@
 package at.ac.hcw.battleship.model;
 
-import at.ac.hcw.battleship.players.Coord;
+import at.ac.hcw.battleship.players.Coordinates;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,7 @@ public class Ship {
     private final String name;
     private boolean placed;
     private boolean horizontal;
-    private final List<Coord> coordinates;
+    private final List<Coordinates> coordinates;
     private int hits;
 
     public Ship(String name, int length) {
@@ -54,11 +54,11 @@ public class Ship {
     /**
      * Immutable view of the coordinates occupied by this ship.
      */
-    public List<Coord> getCoordinates() {
+    public List<Coordinates> getCoordinates() {
         return Collections.unmodifiableList(coordinates);
     }
 
-    public void addCoordinate(Coord coordinate) {
+    public void addCoordinate(Coordinates coordinate) {
         coordinates.add(coordinate);
     }
 

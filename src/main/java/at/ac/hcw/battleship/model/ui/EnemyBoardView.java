@@ -2,7 +2,7 @@ package at.ac.hcw.battleship.model.ui;
 
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.enums.CellState;
-import at.ac.hcw.battleship.players.Coord;
+import at.ac.hcw.battleship.players.Coordinates;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
@@ -25,7 +25,7 @@ public class EnemyBoardView extends InteractiveBoardView {
      * Callback invoked when the user clicks a cell that can be shot at.
      * The Coord contains the row and column of the shot.
      */
-    private Consumer<Coord> onHumanShot;
+    private Consumer<Coordinates> onHumanShot;
 
     public EnemyBoardView(GameBoard gameBoard) {
         super(gameBoard);
@@ -35,7 +35,7 @@ public class EnemyBoardView extends InteractiveBoardView {
      * Sets the callback that will be executed when the user performs
      * a valid shot (on an EMPTY or SHIP cell).
      */
-    public void setOnHumanShot(Consumer<Coord> onHumanShot) {
+    public void setOnHumanShot(Consumer<Coordinates> onHumanShot) {
         this.onHumanShot = Objects.requireNonNull(onHumanShot, "onHumanShot must not be null");
     }
 
@@ -46,7 +46,7 @@ public class EnemyBoardView extends InteractiveBoardView {
 
         // Only allow shots on cells that have not been shot before.
         if ((cell == CellState.EMPTY || cell == CellState.SHIP) && onHumanShot != null) {
-            onHumanShot.accept(new Coord(row, col));
+            onHumanShot.accept(new Coordinates(row, col));
         }
     }
 
