@@ -37,6 +37,10 @@ public class BoardView extends InteractiveBoardView {
 
     @Override
     protected void onCellClicked(int row, int col) {
+        if(setup.allShipsPlaced()){
+            return;
+        }
+
         if (currentShip == null){
             currentShip = setup.getShips().get(shipIndex);
             statusLabel.setText("Place " + currentShip.toString());
