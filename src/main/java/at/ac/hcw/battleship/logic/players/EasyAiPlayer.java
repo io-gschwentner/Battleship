@@ -1,6 +1,7 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.logic.players;
 
 import at.ac.hcw.battleship.model.Targetable;
+import at.ac.hcw.battleship.model.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,13 @@ import java.util.Random;
 public class EasyAiPlayer implements Player {
 
     private final Random random = new Random();
-    private final List<Coord> remainingShots;
+    private final List<Coordinates> remainingShots;
 
     public EasyAiPlayer(int boardSize) {
         this.remainingShots = new ArrayList<>();
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
-                remainingShots.add(new Coord(row, col));
+                remainingShots.add(new Coordinates(row, col));
             }
         }
     }
@@ -28,14 +29,14 @@ public class EasyAiPlayer implements Player {
         if (remainingShots.isEmpty()) {
             return;
         }
-        Coord shot = chooseShot();
-        targetableGameBoard.fireAt(shot.row, shot.col);
-        System.out.println("AI shot at: " + shot.row + "," + shot.col);
+        Coordinates shot = chooseShot();
+        targetableGameBoard.fireAt(shot.row(), shot.col());
+        System.out.println("AI shot at: " + shot.row() + "," + shot.col());
     }
 
-    private Coord chooseShot() {
+    private Coordinates chooseShot() {
         int index = random.nextInt(remainingShots.size());
-        Coord next = remainingShots.get(index);
+        Coordinates next = remainingShots.get(index);
         remainingShots.remove(index);
         return next;
     }

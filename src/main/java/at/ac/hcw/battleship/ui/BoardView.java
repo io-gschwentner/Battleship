@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.model.ui;
+package at.ac.hcw.battleship.ui;
 
 import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.model.Ship;
@@ -57,10 +57,9 @@ public class BoardView extends InteractiveBoardView {
 
         currentShip.setPlaced(true);
 
-//        next ship
+//      next ship
         shipIndex++;
         currentShip = null;
-
         if (setup.allShipsPlaced()) {
             startGameButton.setDisable(false);
             statusLabel.setText("All ships have been placed!");

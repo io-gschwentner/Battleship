@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.model;
 
 import at.ac.hcw.battleship.model.enums.KnownCellState;
 

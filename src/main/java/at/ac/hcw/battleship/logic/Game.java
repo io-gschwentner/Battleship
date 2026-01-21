@@ -1,7 +1,7 @@
 package at.ac.hcw.battleship.logic;
 
 import at.ac.hcw.battleship.model.GameBoard;
-import at.ac.hcw.battleship.players.Player;
+import at.ac.hcw.battleship.logic.players.Player;
 
 /**
  * Coordinates a Battleship match between two players on two boards.

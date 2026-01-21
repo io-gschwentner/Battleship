@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.model.ui;
+package at.ac.hcw.battleship.ui;
 
 import at.ac.hcw.battleship.model.GameBoard;
 import javafx.geometry.Insets;
@@ -17,14 +17,14 @@ import javafx.scene.layout.VBox;
  *
  * All game logic stays outside this class.
  */
-public class MultiplayerBattleshipGameView implements BattleshipGameView {
+public class AiBattleshipGameView implements BattleshipGameView {
 
-    private final EnemyBoardView player1BoardView;
-    private final EnemyBoardView player2BoardView;
+    private final PlayerBoardView playerBoardView;
+    private final EnemyBoardView enemyBoardView;
 
     // we keep the actual nodes so we can disable them
-    private BorderPane player1Root;
-    private BorderPane player2Root;
+    private BorderPane enemyRoot;
+    private BorderPane playerRoot;
 
     private final Label statusLabel;
     private final Label hitsLabel;
@@ -33,9 +33,9 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
 
     private final Button backButton = new Button("Back to main menu");
 
-    public MultiplayerBattleshipGameView(GameBoard playerGameBoard, GameBoard enemyGameBoard) {
-        this.player1BoardView = new EnemyBoardView(playerGameBoard);
-        this.player2BoardView = new EnemyBoardView(enemyGameBoard);
+    public AiBattleshipGameView(GameBoard playerGameBoard, GameBoard enemyGameBoard) {
+        this.playerBoardView = new PlayerBoardView(playerGameBoard);
+        this.enemyBoardView = new EnemyBoardView(enemyGameBoard);
 
         this.statusLabel = new Label("Game started");
         this.statusLabel.getStyleClass().add("status-text");
@@ -52,11 +52,11 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
     public HBox createRoot() {
         HBox root = new HBox(20);
 
-        this.player1Root = player1BoardView.createRoot();
-        this.player2Root = player2BoardView.createRoot();
+        this.playerRoot = playerBoardView.createRoot();
+        this.enemyRoot = enemyBoardView.createRoot();
         VBox statsPane = createStatsPane();
 
-        root.getChildren().addAll(player1Root, player2Root, statsPane);
+        root.getChildren().addAll(playerRoot, enemyRoot, statsPane);
         root.setPadding(new Insets(10));
         return root;
     }
@@ -83,39 +83,31 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
 
     @Override
     public void disableInteractions() {
-        setPlayer1BoardDisabled(true);
-        setPlayer2BoardDisabled(true);
+        setPlayerBoardDisabled();
+        setEnemyBoardDisabled(true);
     }
 
     public void setStatus(String message) {
         statusLabel.setText(message);
     }
 
-    /** Enable / disable the board UI (used to enforce turn order). */
-    public void swapDisabledBoard(){
-        if (player1Root != null && player2Root != null) {
-            player1Root.setDisable(!player1Root.isDisable());
-            player2Root.setDisable(!player2Root.isDisable());
+    public void setPlayerBoardDisabled() {
+        playerRoot.setDisable(true);
+    }
+
+    /** Enable / disable the enemy board UI (used to enforce turn order). */
+    public void setEnemyBoardDisabled(boolean disabled) {
+        if (enemyRoot != null) {
+            enemyRoot.setDisable(disabled);
         }
     }
 
-    public void setPlayer1BoardDisabled(boolean disabled) {
-        if (player1Root != null) {
-            player1Root.setDisable(disabled);
-        }
-    }
-    public void setPlayer2BoardDisabled(boolean disabled) {
-        if (player2Root != null) {
-            player2Root.setDisable(disabled);
-        }
+    public PlayerBoardView getPlayerBoardView() {
+        return playerBoardView;
     }
 
-    public EnemyBoardView getPlayer1BoardView() {
-        return player1BoardView;
-    }
-
-    public EnemyBoardView getPlayer2BoardView() {
-        return player2BoardView;
+    public EnemyBoardView getEnemyBoardView() {
+        return enemyBoardView;
     }
 
     public Button getBackButton() {

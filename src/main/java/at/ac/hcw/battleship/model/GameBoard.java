@@ -1,7 +1,6 @@
 package at.ac.hcw.battleship.model;
 
 import at.ac.hcw.battleship.model.enums.CellState;
-import at.ac.hcw.battleship.players.Coord;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -111,7 +110,7 @@ public class GameBoard implements Targetable {
         for (int r = row; r <= endRow; r++) {
             for (int c = col; c <= endCol; c++) {
                 grid[r][c].set(CellState.SHIP);
-                ship.addCoordinate(new Coord(r, c));
+                ship.addCoordinate(new Coordinates(r, c));
             }
         }
         ships.add(ship);
@@ -139,8 +138,8 @@ public class GameBoard implements Targetable {
      */
     private Ship findShipAt(int row, int col) {
         for (Ship ship : ships) {
-            for (Coord coordinate : ship.getCoordinates()) {
-                if (coordinate.row == row && coordinate.col == col) {
+            for (Coordinates coordinate : ship.getCoordinates()) {
+                if (coordinate.row() == row && coordinate.col() == col) {
                     return ship;
                 }
             }
@@ -170,8 +169,8 @@ public class GameBoard implements Targetable {
             ship.addHit();
 
             if (ship.isSunk()) {
-                for (Coord coordinate : ship.getCoordinates()) {
-                    grid[coordinate.row][coordinate.col].set(CellState.SUNK);
+                for (Coordinates coordinate : ship.getCoordinates()) {
+                    grid[coordinate.row()][coordinate.col()].set(CellState.SUNK);
                 }
                 return CellState.SUNK;
             }

@@ -1,8 +1,10 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.logic.players;
 
 import at.ac.hcw.battleship.model.Targetable;
 import at.ac.hcw.battleship.model.enums.CellState;
 import at.ac.hcw.battleship.model.enums.KnownCellState;
+import at.ac.hcw.battleship.model.Coordinates;
+import at.ac.hcw.battleship.model.KnownGameBoard;
 
 import java.util.*;
 
@@ -15,7 +17,7 @@ public class MediumAiPlayer implements Player {
 
     private final KnownGameBoard gameState;
     private final Random random = new Random();
-    private final Deque<Coord> targetQueue = new ArrayDeque<>();
+    private final Deque<Coordinates> targetQueue = new ArrayDeque<>();
 
     public MediumAiPlayer(KnownGameBoard gameState) {
         this.gameState = gameState;
@@ -23,12 +25,12 @@ public class MediumAiPlayer implements Player {
 
     @Override
     public void takeTurn(Targetable targetableGameBoard) {
-        Coord shot = chooseShot();
-        CellState result = targetableGameBoard.fireAt(shot.row, shot.col);
+        Coordinates shot = chooseShot();
+        CellState result = targetableGameBoard.fireAt(shot.row(), shot.col());
         processResult(shot, result);
     }
 
-    private Coord chooseShot() {
+    private Coordinates chooseShot() {
         if (!targetQueue.isEmpty()) {
             return targetQueue.poll();
         }
@@ -38,15 +40,15 @@ public class MediumAiPlayer implements Player {
     /**
      * Uses a checkerboard pattern first, then falls back to all UNKNOWN cells.
      */
-    private Coord huntShot() {
-        List<Coord> candidates = new ArrayList<>();
+    private Coordinates huntShot() {
+        List<Coordinates> candidates = new ArrayList<>();
 
         int size = gameState.getSize();
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 if (gameState.getCell(row, col) == KnownCellState.UNKNOWN
                         && (row + col) % 2 == 0) {
-                    candidates.add(new Coord(row, col));
+                    candidates.add(new Coordinates(row, col));
                 }
             }
         }
@@ -55,7 +57,7 @@ public class MediumAiPlayer implements Player {
             for (int row = 0; row < size; row++) {
                 for (int col = 0; col < size; col++) {
                     if (gameState.getCell(row, col) == KnownCellState.UNKNOWN) {
-                        candidates.add(new Coord(row, col));
+                        candidates.add(new Coordinates(row, col));
                     }
                 }
             }
@@ -65,34 +67,34 @@ public class MediumAiPlayer implements Player {
         return candidates.get(index);
     }
 
-    private void processResult(Coord shot, CellState result) {
+    private void processResult(Coordinates shot, CellState result) {
         if (result == CellState.HIT) {
-            gameState.setCell(shot.row, shot.col, KnownCellState.HIT);
+            gameState.setCell(shot.row(), shot.col(), KnownCellState.HIT);
             enqueueAdjacent(shot);
         } else if (result == CellState.SUNK) {
-            gameState.setCell(shot.row, shot.col, KnownCellState.HIT);
+            gameState.setCell(shot.row(), shot.col(), KnownCellState.HIT);
             targetQueue.clear();
         } else if (result == CellState.MISS) {
-            gameState.setCell(shot.row, shot.col, KnownCellState.MISS);
+            gameState.setCell(shot.row(), shot.col(), KnownCellState.MISS);
         }
     }
 
     /**
      * Adds adjacent UNKNOWN cells to the target queue.
      */
-    private void enqueueAdjacent(Coord hit) {
+    private void enqueueAdjacent(Coordinates hit) {
         int[][] dirs = {
                 {-1, 0}, {1, 0},
                 {0, -1}, {0, 1}
         };
 
         for (int[] d : dirs) {
-            int nextRow = hit.row + d[0];
-            int nextCol = hit.col + d[1];
+            int nextRow = hit.row() + d[0];
+            int nextCol = hit.col() + d[1];
 
             if (inBounds(nextRow, nextCol)
                     && gameState.getCell(nextRow, nextCol) == KnownCellState.UNKNOWN) {
-                targetQueue.add(new Coord(nextRow, nextCol));
+                targetQueue.add(new Coordinates(nextRow, nextCol));
             }
         }
     }
