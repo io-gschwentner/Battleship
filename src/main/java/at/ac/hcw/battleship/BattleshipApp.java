@@ -160,8 +160,14 @@ public class BattleshipApp extends Application {
 
         view.getEnemyBoardView().setOnHumanShot(coord -> {
             if (handleShot(coord, game, enemyBoard, stats, view)) {
+                view.updateStats(stats.hits, stats.misses, enemyBoard.getRemainingShipCells());
                 view.setStatus("Enemy taking turn");
-                game.playTurn(); // AI turn
+                if (isFinished(game)) {
+                    view.setStatus(gameResultText(game));
+                    view.disableInteractions();
+                    return;
+                }
+                game.playTurn(); //pass turn to human
                 view.setEnemyBoardDisabled(false);
                 view.setStatus("Your turn");
             }
@@ -182,12 +188,14 @@ public class BattleshipApp extends Application {
         view.getPlayer2BoardView().setOnHumanShot(coord -> {
             view.swapDisabledBoard();
             handleShot(coord, game, p2Board, p1Stats, view);
+            view.updateStats(p2Stats.hits, p2Stats.misses, p1Board.getRemainingShipCells());
         });
 
         // Player 2 shoots at Player 1's board
         view.getPlayer1BoardView().setOnHumanShot(coord -> {
             view.swapDisabledBoard();
             handleShot(coord, game, p1Board, p2Stats, view);
+            view.updateStats(p1Stats.hits, p1Stats.misses, p2Board.getRemainingShipCells());
         });
     }
 
@@ -199,6 +207,7 @@ public class BattleshipApp extends Application {
 
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
+            view.disableInteractions();
             return false;
         }
 
@@ -209,15 +218,13 @@ public class BattleshipApp extends Application {
             case MISS      -> stats.misses++;
         }
 
-        view.updateStats(stats.hits, stats.misses,
-                enemyBoard.getRemainingShipCells());
-
         if (isFinished(game)) {
             view.setStatus(gameResultText(game));
+            view.disableInteractions();
             return false;
         }
 
-        game.playTurn();
+        game.playTurn(); //pass turn (to AI/ other Player)
         return true;
     }
 

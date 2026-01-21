@@ -63,6 +63,7 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
 
     private VBox createStatsPane() {
         VBox box = new VBox(8);
+        box.setMinWidth(200);
         box.setAlignment(Pos.TOP_LEFT);
         box.setPadding(new Insets(10));
         box.getStyleClass().add("stats-panel");
@@ -78,6 +79,12 @@ public class MultiplayerBattleshipGameView implements BattleshipGameView {
         hitsLabel.setText("Hits: " + hits);
         missesLabel.setText("Misses: " + misses);
         enemyShipsLabel.setText("Enemy ships left: " + enemyShipsRemaining);
+    }
+
+    @Override
+    public void disableInteractions() {
+        setPlayer1BoardDisabled(true);
+        setPlayer2BoardDisabled(true);
     }
 
     public void setStatus(String message) {
