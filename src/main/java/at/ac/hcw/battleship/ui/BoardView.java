@@ -57,10 +57,9 @@ public class BoardView extends InteractiveBoardView {
 
         currentShip.setPlaced(true);
 
-//        next ship
+//      next ship
         shipIndex++;
         currentShip = null;
-
         if (setup.allShipsPlaced()) {
             startGameButton.setDisable(false);
             statusLabel.setText("All ships have been placed!");
