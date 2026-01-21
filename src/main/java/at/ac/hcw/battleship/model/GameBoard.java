@@ -1,7 +1,6 @@
 package at.ac.hcw.battleship.model;
 
 import at.ac.hcw.battleship.model.enums.CellState;
-import at.ac.hcw.battleship.players.Coordinates;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 

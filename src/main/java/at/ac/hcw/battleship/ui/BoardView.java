@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.model.ui;
+package at.ac.hcw.battleship.ui;
 
 import at.ac.hcw.battleship.logic.GameSetup;
 import at.ac.hcw.battleship.model.Ship;

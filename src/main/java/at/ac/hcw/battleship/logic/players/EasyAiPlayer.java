@@ -1,6 +1,7 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.logic.players;
 
 import at.ac.hcw.battleship.model.Targetable;
+import at.ac.hcw.battleship.model.Coordinates;
 
 import java.util.ArrayList;
 import java.util.List;

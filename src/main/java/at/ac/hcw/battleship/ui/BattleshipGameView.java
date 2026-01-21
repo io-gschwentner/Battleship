@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.model.ui;
+package at.ac.hcw.battleship.ui;
 
 public interface BattleshipGameView {
     void setStatus(String message);

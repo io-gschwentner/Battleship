@@ -1,8 +1,10 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.logic.players;
 
 import at.ac.hcw.battleship.model.Targetable;
 import at.ac.hcw.battleship.model.enums.CellState;
 import at.ac.hcw.battleship.model.enums.KnownCellState;
+import at.ac.hcw.battleship.model.Coordinates;
+import at.ac.hcw.battleship.model.KnownGameBoard;
 
 import java.util.*;
 

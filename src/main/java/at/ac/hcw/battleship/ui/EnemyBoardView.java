@@ -1,8 +1,8 @@
-package at.ac.hcw.battleship.model.ui;
+package at.ac.hcw.battleship.ui;
 
 import at.ac.hcw.battleship.model.GameBoard;
 import at.ac.hcw.battleship.model.enums.CellState;
-import at.ac.hcw.battleship.players.Coordinates;
+import at.ac.hcw.battleship.model.Coordinates;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;

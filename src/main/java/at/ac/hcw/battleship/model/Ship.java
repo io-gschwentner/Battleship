@@ -1,7 +1,5 @@
 package at.ac.hcw.battleship.model;
 
-import at.ac.hcw.battleship.players.Coordinates;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

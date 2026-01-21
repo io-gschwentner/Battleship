@@ -1,4 +1,4 @@
-package at.ac.hcw.battleship.players;
+package at.ac.hcw.battleship.logic.players;
 
 import at.ac.hcw.battleship.model.Targetable;
 
