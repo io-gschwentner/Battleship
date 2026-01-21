@@ -67,7 +67,7 @@ public class BattleshipApp extends Application {
         this.gameMode = mode;
 
         if (mode == GameMode.TWO_PLAYERS) {
-            continueMultiplayerPlacement(stage);
+            startMultiplayerPlacement(stage);
         } else {
             startSinglePlacement(stage);
         }
@@ -85,7 +85,7 @@ public class BattleshipApp extends Application {
                 startAiGame(stage, setupView.getBoard()));
     }
 
-    private void continueMultiplayerPlacement(Stage stage) {
+    private void startMultiplayerPlacement(Stage stage) {
         BoardView p1View = new BoardView();
         setScene(stage, p1View.createRoot(), PLACEMENT_WIDTH, HEIGHT,
                 "Player 1 – Place your ships");
@@ -158,8 +158,8 @@ public class BattleshipApp extends Application {
         view.updateStats(stats.hits, stats.misses, enemyBoard.getRemainingShipCells());
         view.setStatus("Your turn");
 
-        view.getEnemyBoardView().setOnHumanShot(coord -> {
-            if (handleShot(coord, game, enemyBoard, stats, view)) {
+        view.getEnemyBoardView().setOnHumanShot(coordinates -> {
+            if (handleShot(coordinates, game, enemyBoard, stats, view)) {
                 view.updateStats(stats.hits, stats.misses, enemyBoard.getRemainingShipCells());
                 view.setStatus("Enemy taking turn");
                 if (isFinished(game)) {
@@ -199,6 +199,9 @@ public class BattleshipApp extends Application {
         });
     }
 
+    /**
+     * Handles input from UI
+     */
     private boolean handleShot(Coordinates coordinates,
                                Game game,
                                GameBoard enemyBoard,
@@ -229,7 +232,6 @@ public class BattleshipApp extends Application {
     }
 
     // ---------- Helpers ----------
-
     private Player createOpponent() {
         return switch (gameMode) {
             case TWO_PLAYERS -> new HumanPlayer();
@@ -257,8 +259,8 @@ public class BattleshipApp extends Application {
 
     private String gameResultText(Game game) {
         return switch (game.getResult()) {
-            case PLAYER1_WINS -> "Game over – You win!";
-            case PLAYER2_WINS -> "Game over – Opponent wins!";
+            case PLAYER1_WINS -> gameMode == GameMode.TWO_PLAYERS ? "Game over – Player 1 wins!" : "Game over – You win!";
+            case PLAYER2_WINS -> gameMode == GameMode.TWO_PLAYERS ? "Game over – Player 2 wins!" : "Game over – Opponent wins!";
             case DRAW         -> "Game over – Draw";
             default           -> "Game over";
         };
@@ -290,6 +292,9 @@ public class BattleshipApp extends Application {
         return btn;
     }
 
+    /**
+     * @return Returns a Styled Label containing the games title
+     */
     private Label styledLabel() {
         Label label = new Label(TITLE);
         label.setStyle("-fx-text-fill: white; -fx-font-size: " + FONT_SIZE +
