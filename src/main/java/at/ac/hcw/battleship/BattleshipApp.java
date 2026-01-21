@@ -262,6 +262,14 @@ public class BattleshipApp extends Application {
     }
 
     private String gameResultText(Game game) {
+        if(gameMode == GameMode.TWO_PLAYERS){
+            return switch (game.getResult()) {
+                case PLAYER1_WINS -> "Game over – Player 1 wins!";
+                case PLAYER2_WINS -> "Game over – Player 2 wins!";
+                case DRAW         -> "Game over – Draw";
+                default           -> "Game over";
+            };
+        }
         return switch (game.getResult()) {
             case PLAYER1_WINS -> gameMode == GameMode.TWO_PLAYERS ? "Game over – Player 1 wins!" : "Game over – You win!";
             case PLAYER2_WINS -> gameMode == GameMode.TWO_PLAYERS ? "Game over – Player 2 wins!" : "Game over – Opponent wins!";
